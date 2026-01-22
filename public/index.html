@@ -28,14 +28,14 @@
     
       <div class="nav-menu" id="nav-menu">
         <ul class="nav-links">
-          <li>Why Us?</li>
-          <li>How it works</li>
-          <li>FAQs</li>
+          <li><a href="#why-us">Why Us?</a></li>
+          <li><a href="#how-it-works">How it works</a></li>
+          <li><a href="#faqs">FAQs</a></li>
         </ul>
     
         <div class="nav-cta">
-          <button class="button register-cta">Register</button>
-          <button class="button tutor-cta">Become a Tutor</button>
+          <button class="button register-cta" data-route="/register">Register</button>
+          <button class="button tutor-cta" data-route="/tutors/apply">Become a Tutor</button>
         </div>
       </div>
     </nav>
@@ -48,11 +48,11 @@
       <h1 class="hero-h1">Measure and improve your child's maths in 3 weeks.</h1>
       <p class="hero-description">We start with a maths assessment, deliver targeted online lessons, then re-test to clearly measure your child’s progress. See your child's progress in 3 weeks not 3 terms</p>
       <div class="hero-cta">
-        <button class="register register-cta button">
+        <button class="register register-cta button" data-route="/register">
           <span class="btn-text">Register</span>
           <i class="fa-solid fa-arrow-right btn-icon" aria-hidden="true"></i>
         </button>
-        <button class="tutor tutor-cta button" >
+        <button class="tutor tutor-cta button" data-route="/tutors/apply">
           <span class="btn-text">Become a Tutor</span>
           <i class="fa-solid fa-arrow-right btn-icon" aria-hidden="true"></i>
         </button>
@@ -62,7 +62,7 @@
       <!-- <img src="/assets/images/hero.svg" alt="hero-img" class="hero-img"> -->
     </div>
   </section>
-  <section class="why-us">
+  <section id="why-us" class="why-us">
     <br><br>
       <h1 class="section-head">
         What You Get From Us By Registering
@@ -78,7 +78,7 @@
           <li class="register-info-list">One to one online sessions</li>
           <li class="register-info-list">Get a simple report you can actually understand</li>
           <li class="register-info-list">Perfect for WAEC and GCSE students</li>
-          <button style="margin-top:5%;" class="register register-cta button">
+          <button style="margin-top:5%;" class="register register-cta button" data-route="/register">
             <span class="btn-text"  >Register</span>
             <i class="fa-solid fa-arrow-right btn-icon" aria-hidden="true"></i>
           </button>
@@ -104,14 +104,14 @@
           <li class="tutor-info-list">Get paid consistently every month</li>
           <li class="tutor-info-list">Verified teaching experience you can put on your CV</li>
           <li class="tutor-info-list">Make real impact in a child’s education</li>
-          <button style="width:25%;margin-top:5%;" class="tutor tutor-cta button" >
+          <button style="width:25%;margin-top:5%;" class="tutor tutor-cta button" data-route="/tutors/apply">
             <span class="btn-text" >Become a Tutor</span>
             <i class="fa-solid fa-arrow-right btn-icon" aria-hidden="true"></i>
           </button>
         </div>
       </div>
   </section>
-  <section class="how-it-works">
+  <section class="how-it-works" id="how-it-works">
     <h1 class="section-head" style="margin-top: 5%;">How Do We Work?</h1>
     <div class="how-it-works-parents">
       <h2 class="how-it-works-h2">How Your Child Gets Better</h2>
@@ -138,7 +138,7 @@
           </p>
         </div>
       </div>
-      <button style="margin-top:5%;" class="register register-cta button">
+      <button style="margin-top:5%;" class="register register-cta button"data-route="/register">
         <span class="btn-text">Register</span>
         <i class="fa-solid fa-arrow-right btn-icon" aria-hidden="true"></i>
       </button>
@@ -169,7 +169,7 @@
           </p>
         </div>
       </div>
-      <button style="width:20%;margin-top:5%;" class="tutor tutor-cta button" >
+      <button style="width:20%;margin-top:5%;" class="tutor tutor-cta button" data-route="/tutors/apply">
         <span class="btn-text">Become a Tutor</span>
         <i class="fa-solid fa-arrow-right btn-icon" aria-hidden="true"></i>
       </button>
@@ -343,10 +343,10 @@
         <input type="button" value="Subscribe" id="subscribe-btn" class="yellow-button">
       </form>
       <div class="footer-nav">
-        <li><a href="#">Register</a></li>
-        <li><a href="#">How it works</a></li>
-        <li><a href="#">Testimonials</a></li>
-        <li><a href="#">FAQs</a></li>
+        <li><a href="/register">Register</a></li>
+        <li><a href="#how-it-works">How it works</a></li>
+        <li><a href="#testimonials">Testimonials</a></li>
+        <li><a href="#faqs">FAQs</a></li>
 
       </div>
     </div>
@@ -440,6 +440,16 @@ document.querySelectorAll(".nav-links li").forEach((item) => {
     }
   });
 });
+
+document.querySelectorAll("button[data-route]").forEach(button => {
+  button.addEventListener("click", () => {
+    const route = button.dataset.route;
+    if (route) {
+      window.location.href = route;
+    }
+  });
+});
+
 
 </script>
 </html>
