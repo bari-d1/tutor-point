@@ -1,0 +1,28 @@
+:root {
+    /* Brand – Core */
+    --color-black: #2A2A2A;
+    --color-yellow: #FFEB3C;
+    --color-yellow-pale: #FEFBDD;
+  
+    /* Neutrals */
+    --color-white: #EEEEEE;
+    --color-gray-light: #EDEDEC;
+  
+    /* Brand – Accent */
+    --color-purple: #9E7AFF;
+    --color-purple-light: #C1AAFF;
+  
+    /* Semantic aliases (recommended) */
+    --text-primary: var(--color-black);
+    --text-inverse: var(--color-white);
+  
+    --bg-primary: var(--color-white);
+    --bg-secondary: var(--color-gray-light);
+    --bg-highlight: var(--color-yellow-pale);
+  
+    --accent-primary: var(--color-yellow);
+    --accent-secondary: var(--color-purple);
+  
+    --border-default: var(--color-gray-light);
+  }
+  

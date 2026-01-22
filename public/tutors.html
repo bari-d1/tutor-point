@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tutor Point Tutor Signup</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="tp-header">
+    <div class="tp-container header-inner">
+      <div class="logo">Tutor<span>Point</span></div>
+      <nav class="nav">
+        <a href="/#how-it-works">Maths programme</a>
+        <a href="#requirements">Requirements</a>
+        <a href="#apply" class="nav-cta">Apply</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="tp-container hero-grid">
+        <div class="hero-text">
+          <p class="badge">NYSC Tutor Recruitment</p>
+          <h1>Teach Maths online, earn consistently, and build proof of your skills.</h1>
+          <p class="hero-sub">
+            We are recruiting NYSC members who can teach Maths confidently in a virtual environment.
+            The process includes a short Maths test and a live teaching demonstration.
+          </p>
+
+          <a href="#apply" class="primary-btn">Apply as a Tutor</a>
+          <!-- <p class="small-note">This is a pilot, we are building a strong first cohort of tutors.</p> -->
+        </div>
+
+        <div class="hero-card">
+          <h2>Selection steps</h2>
+          <ol>
+            <li>Application and screening</li>
+            <li>2 part test: Maths proficiency, behavioural and values</li>
+            <li>Live teaching demonstration (choose 1 of 3 topics)</li>
+          </ol>
+          <!-- <p class="hero-card-note">Successful tutors get onboarding and consistent lesson allocations.</p> -->
+        </div>
+      </div>
+    </section>
+
+    <section id="requirements" class="section">
+      <div class="tp-container">
+        <h2>Minimum requirements</h2>
+        <div class="steps-grid">
+          <div class="step">
+            <span class="step-number">1</span>
+            <h3>NYSC status</h3>
+            <p>You are currently serving or recently completed NYSC, and can provide proof if needed.</p>
+          </div>
+          <div class="step">
+            <span class="step-number">2</span>
+            <h3>Maths competence</h3>
+            <p>You can teach Maths clearly up to WAEC and GCSE level, and can pass a short standardised test.</p>
+          </div>
+          <div class="step" style="color: black;">
+            <span class="step-number">3</span>
+            <h3>Virtual engagement</h3>
+            <p>You can keep students engaged online and explain steps clearly, ideally using a stylus or writing tool.</p>
+          </div>
+          <div class="step">
+            <span class="step-number">4</span>
+            <h3>Reliable setup</h3>
+            <p>Stable internet, a laptop, and a quiet space. A tablet with stylus is preferred.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="apply" class="section section-alt">
+      <div class="tp-container">
+        <h2>Apply as a Tutor</h2>
+        <p class="section-intro">
+          Fill this form and we will contact you with next steps for the Maths test and live teaching demonstration.
+        </p>
+
+        <form id="tutorForm" novalidate>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="fullName">Full name *</label>
+              <input type="text" id="fullName" name="fullName" required />
+              <p class="error-msg" data-for="fullName"></p>
+            </div>
+
+            <div class="form-group">
+              <label for="email">Email *</label>
+              <input type="email" id="email" name="email" required />
+              <p class="error-msg" data-for="email"></p>
+            </div>
+
+            <div class="form-group">
+              <label for="phone">Phone / WhatsApp *</label>
+              <input type="tel" id="phone" name="phone" required />
+              <p class="error-msg" data-for="phone"></p>
+            </div>
+
+            <div class="form-group">
+              <label for="currentLocation">Current location (city, state) *</label>
+              <input type="text" id="currentLocation" name="currentLocation" required />
+              <p class="error-msg" data-for="currentLocation"></p>
+            </div>
+
+            <div class="form-group">
+              <label for="nyscStatus">NYSC status *</label>
+              <select id="nyscStatus" name="nyscStatus" required>
+                <option value="">Select</option>
+                <option value="Currently serving">Currently serving</option>
+                <option value="Completed in last 12 months">Completed in last 12 months</option>
+                <option value="Other">Other</option>
+              </select>
+              <p class="error-msg" data-for="nyscStatus"></p>
+            </div>
+
+            <div class="form-group">
+              <label for="discipline">Degree / discipline *</label>
+              <input type="text" id="discipline" name="discipline" required placeholder="For example: Mathematics, Engineering" />
+              <p class="error-msg" data-for="discipline"></p>
+            </div>
+
+            <div class="form-group">
+              <label for="mathConfidence">Maths confidence level *</label>
+              <select id="mathConfidence" name="mathConfidence" required>
+                <option value="">Select</option>
+                <option value="Very confident">Very confident</option>
+                <option value="Confident">Confident</option>
+                <option value="Somewhat confident">Somewhat confident</option>
+              </select>
+              <p class="error-msg" data-for="mathConfidence"></p>
+            </div>
+
+            <div class="form-group">
+              <label for="experience">Teaching experience *</label>
+              <select id="experience" name="experience" required>
+                <option value="">Select</option>
+                <option value="None">None</option>
+                <option value="Peer tutoring">Peer tutoring</option>
+                <option value="Private tutoring">Private tutoring</option>
+                <option value="School teaching">School teaching</option>
+                <option value="Online tutoring">Online tutoring</option>
+              </select>
+              <p class="error-msg" data-for="experience"></p>
+            </div>
+
+            <div class="form-group">
+              <label for="availability">Weekly availability *</label>
+              <select id="availability" name="availability" required>
+                <option value="">Select</option>
+                <option value="2 to 4 hours">2 to 4 hours</option>
+                <option value="5 to 8 hours">5 to 8 hours</option>
+                <option value="9 to 12 hours">9 to 12 hours</option>
+                <option value="12+ hours">12+ hours</option>
+              </select>
+              <p class="error-msg" data-for="availability"></p>
+            </div>
+
+            <div class="form-group">
+              <label for="device">Teaching device *</label>
+              <select id="device" name="device" required>
+                <option value="">Select</option>
+                <option value="Laptop only">Laptop only</option>
+                <option value="Laptop + tablet with stylus">Laptop + tablet with stylus</option>
+                <option value="Tablet with stylus only">Tablet with stylus only</option>
+              </select>
+              <p class="error-msg" data-for="device"></p>
+            </div>
+
+            <div class="form-group">
+              <label for="internet">Internet reliability *</label>
+              <select id="internet" name="internet" required>
+                <option value="">Select</option>
+                <option value="Very reliable">Very reliable</option>
+                <option value="Mostly reliable">Mostly reliable</option>
+                <option value="Sometimes unstable">Sometimes unstable</option>
+              </select>
+              <p class="error-msg" data-for="internet"></p>
+            </div>
+
+            <div class="form-group form-group-full">
+              <label for="whyTutor">Why do you want to tutor with Tutor Point? *</label>
+              <textarea id="whyTutor" name="whyTutor" rows="3" required></textarea>
+              <p class="error-msg" data-for="whyTutor"></p>
+            </div>
+
+            <div class="form-group form-group-full">
+              <label for="values">Values question: Describe a time you showed integrity or responsibility. *</label>
+              <textarea id="values" name="values" rows="3" required></textarea>
+              <p class="error-msg" data-for="values"></p>
+            </div>
+
+            <div class="form-group form-group-full">
+              <label class="checkbox-label">
+                <input type="checkbox" id="consentTutor" name="consentTutor" required />
+                <span>I agree that Tutor Point can contact me about tests, interviews, and onboarding, and store my application for recruitment purposes.</span>
+              </label>
+              <p class="error-msg" data-for="consentTutor"></p>
+            </div>
+          </div>
+
+          <button type="submit" class="primary-btn" id="tutorSubmitBtn">Submit application</button>
+          <p id="tutorStatus" class="form-status"></p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="tp-footer">
+    <div class="tp-container footer-inner">
+      <p>© <span id="year"></span> Tutor Point. All rights reserved.</p>
+      <p class="footer-note">Tutor recruitment · Maths only · NYSC focused</p>
+    </div>
+  </footer>
+
+  <script src="tutor.js"></script>
+</body>
+</html>

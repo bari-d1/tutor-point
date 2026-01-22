@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Lead {
+  id String @id @default(cuid())
+
+  // Core
+  type String
+  fullName String
+  email    String
+  phone    String?
+  location String?
+  subject  String?
+  message  String?
+
+  // Tutor-specific
+  availability String?
+  isNYSC       Boolean?
+
+  // Parent-specific
+  studentYear String?
+  goals       String?
+
+  // Google Sheets sync tracking
+  sheetSyncStatus String   @default("PENDING")
+  sheetSyncedAt   DateTime?
+  sheetLastError  String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([type])
+  @@index([email])
+  @@index([sheetSyncStatus])
+}
