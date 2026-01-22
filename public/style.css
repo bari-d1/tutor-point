@@ -45,6 +45,12 @@ ul, li{
   font-weight: 550;
 }
 
+a{
+  text-decoration: none;
+  color: inherit;
+}
+
+
 button{
   border: none;
   font-family: inherit;
@@ -798,6 +804,9 @@ footer a{
   .footer-nav{
     grid-template-columns: repeat(2, 1fr);
   }
+  .register-right{
+    display: none;
+  }
 }
 
 /* Small phones */
@@ -906,3 +915,95 @@ footer a{
 
 
 
+/* =========================
+   iPad nav fix
+   769px to 1024px
+   Use burger + dropdown (same UX as mobile)
+   ========================= */
+   @media (min-width: 769px) and (max-width: 1024px){
+
+    /* NAV: only logo + burger on the top row */
+    nav{
+      height: auto;
+      min-height: 90px;
+      padding: 1rem var(--container-pad);
+      display: grid;
+      grid-template-columns: 1fr auto;  /* logo | burger */
+      grid-template-rows: auto;
+      align-items: center;
+      gap: 0.75rem;
+    }
+  
+    .logo{
+      padding-left: 0;
+    }
+  
+    .logo img{
+      width: 180px;
+    }
+  
+    /* show burger on iPad */
+    .nav-toggle{
+      display: inline-flex;
+      justify-self: end;
+    }
+  
+    /* hide desktop inline menu by default */
+    .nav-menu{
+      display: none;
+    }
+  
+    /* when open, show dropdown panel */
+    nav.is-open .nav-menu{
+      display: grid;
+      grid-column: 1 / -1;
+      gap: 1rem;
+      margin-top: 0.75rem;
+      padding: 1rem;
+      border-radius: 20px;
+      background: #111111;
+      justify-content: center;
+      /* width: 500px; */
+      align-self: center;
+      align-items: center;
+      align-content: center;
+    }
+  
+    .nav-links{
+      display: grid;
+      /* grid-auto-flow: row; */
+      grid-template-columns: repeat(3,1fr);
+      gap: 1rem;
+      justify-items: center;
+      width: 500px;
+      /* align-content: center; */
+    }
+  
+    .nav-cta{
+      display: grid;
+      /* grid-auto-flow: row; */
+      grid-template-columns: repeat(2,1fr);
+      gap: 0.75rem;
+      justify-content: stretch;
+    }
+  
+    .nav-cta .button{
+      width: 100%;
+      max-width: 420px;
+    }
+  
+    /* burger animation */
+    nav.is-open .nav-toggle .bar:nth-child(1){
+      transform: translateY(8px) rotate(45deg);
+    }
+    nav.is-open .nav-toggle .bar:nth-child(2){
+      opacity: 0;
+    }
+    nav.is-open .nav-toggle .bar:nth-child(3){
+      transform: translateY(-8px) rotate(-45deg);
+    }
+    .register-right{
+      display: none;
+    }
+  }
+  
