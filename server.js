@@ -23,6 +23,23 @@ app.use(express.static(path.join(__dirname, "public")));
 // API routes
 app.use("/api", routes);
 
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+
+// CTA redirects / landing routes
+app.get("/register", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "parent-signup.html"));
+
+});
+
+app.get("/tutors/apply", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "tutor-signup.html"));
+
+});
+
+
 // Basic health
 app.get("/health", (req, res) => res.json({ ok: true }));
 
