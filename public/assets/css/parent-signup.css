@@ -1,0 +1,150 @@
+/* =========================
+   Parent Register Page
+   ========================= */
+
+   .page{
+    padding: 4rem var(--container-pad);
+  }
+  
+  /* Page intro */
+  .page-hero{
+    max-width: 720px;
+    margin: 0 auto 3rem;
+  }
+  
+  .page-h1{
+    font-size: 2.5rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+  }
+  
+  .page-subtext{
+    max-width: 60ch;
+    color: #555;
+  }
+  
+  /* Small badges under heading */
+  .page-badges{
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+  
+  .badge{
+    padding: 0.35rem 0.75rem;
+    border-radius: var(--radius-pill);
+    background: var(--color-gray-light);
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+  
+  /* =========================
+     Form Card
+     ========================= */
+  
+  .form-section{
+    display: flex;
+    justify-content: center;
+  }
+  
+  .form-card{
+    width: 100%;
+    max-width: 640px;
+    background-color: var(--color-gray-light);
+    padding: 2rem;
+    border-radius: var(--radius-lg);
+  }
+  
+  .form-title{
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+  
+  .form-help{
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* =========================
+     Form Layout
+     ========================= */
+  
+  .form{
+    display: grid;
+    gap: 1.25rem;
+  }
+  
+  .form-row{
+    display: grid;
+    gap: 0.35rem;
+  }
+  
+  .form-row label{
+    font-size: 0.85rem;
+    color: #444;
+  }
+  
+  /* Inputs */
+  .form-row input,
+  .form-row select,
+  .form-row textarea{
+    width: 100%;
+    padding: 0 1rem;
+    height: 44px;
+    border-radius: var(--radius-pill);
+    border: 1px solid #ddd;
+    font-family: inherit;
+    font-size: 0.9rem;
+    background-color: white;
+  }
+  
+  /* Textarea override */
+  .form-row textarea{
+    height: auto;
+    padding: 0.75rem 1rem;
+    border-radius: 20px;
+    resize: vertical;
+  }
+  
+  /* FOCUS STATE (your requirement) */
+  .form-row input:focus,
+  .form-row select:focus,
+  .form-row textarea:focus{
+    background-color: #FDFADB;
+    border: 1px solid var(--color-yellow);
+    outline: none;
+  }
+  
+  /* Submit button */
+  .form-submit{
+    margin-top: 1rem;
+    width: 100%;
+    justify-content: center;
+  }
+  
+  /* Footnote */
+  .form-footnote{
+    font-size: 0.75rem;
+    color: #666;
+    margin-top: 0.75rem;
+  }
+  
+  /* =========================
+     Mobile tweaks
+     ========================= */
+  @media (max-width: 768px){
+    .page{
+      padding: 2.5rem var(--container-pad);
+    }
+  
+    .page-h1{
+      font-size: 2rem;
+    }
+  
+    .form-card{
+      padding: 1.5rem;
+      border-radius: 30px;
+    }
+  }
+  

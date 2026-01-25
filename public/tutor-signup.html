@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" href="/assets/css/palette.css" />
+  <link rel="stylesheet" href="/assets/css/tutor-signup.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&display=swap" rel="stylesheet">
+  <title>TutorPoint | Become a Tutor</title>
+</head>
+<body>
+
+  <header>
+    <nav class="nav">
+      <div class="logo">
+        <a href="/"><img src="/assets/images/logo.svg" alt="TutorPoint logo"></a>
+      </div>
+
+      <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
+        <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+      </button>
+
+      <div class="nav-menu" id="nav-menu">
+        <ul class="nav-links">
+          <li><a href="/#hero">Why Us?</a></li>
+          <li><a href="/#how-it-works">How it works</a></li>
+          <li><a href="/#faqs">FAQs</a></li>
+        </ul>
+
+        <div class="nav-cta">
+          <button class="button register-cta" data-route="/register">Register</button>
+          <button class="button tutor-cta" data-route="/tutors/apply">Become a Tutor</button>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main class="page">
+    <section class="page-hero">
+      <div class="page-hero-left">
+        <h1 class="page-h1">Become a Tutor at TutorPoint</h1>
+        <p class="page-subtext">
+          Teach maths online, build verified experience, and earn consistently. Apply in under 5 minutes.
+        </p>
+
+        <div class="page-badges">
+          <div class="badge">Remote</div>
+          <div class="badge">Flexible hours</div>
+          <div class="badge">NYSC friendly</div>
+        </div>
+      </div>
+
+      <div class="page-hero-right">
+        <div class="info-card">
+          <h3 class="info-title">What happens next</h3>
+          <ol class="info-list">
+            <li>We review your application</li>
+            <li>You take a short skills test</li>
+            <li>15-minute teaching demo</li>
+            <li>Onboarding + first student</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <div class="form-card">
+        <h2 class="form-title">Tutor Application</h2>
+        <p class="form-help">Fill this form and we’ll reach out within 48 hours.</p>
+
+        <!-- <form id="tutorForm" class="form" method="post" action="/api/tutors/apply"> -->
+        <form id="tutorForm" class="form" novalidate>
+          <div class="form-row">
+            <label for="fullName">Full name</label>
+            <input id="fullName" name="fullName" type="text" placeholder="e.g. Peter Nwakobi" required />
+          </div>
+
+          <div class="form-row">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" placeholder="e.g. peter@email.com" required />
+          </div>
+
+          <div class="form-row">
+            <label for="phone">Phone number</label>
+            <input id="phone" name="phone" type="tel" placeholder="e.g. +234 801 234 5678" required />
+          </div>
+
+          <div class="form-row">
+            <label for="location">Location (State)</label>
+            <input id="location" name="location" type="text" placeholder="e.g. Kaduna" required />
+          </div>
+
+          <div class="form-row">
+            <label for="education">Highest education</label>
+            <select id="education" name="education" required>
+              <option value="" selected disabled>Select one</option>
+              <option>Undergraduate</option>
+              <option>Graduate</option>
+              <option>Postgraduate</option>
+              <!-- <option>Other</option> -->
+            </select>
+          </div>
+
+          <div class="form-row">
+            <label for="experience">Teaching experience</label>
+            <select id="experience" name="experience" required>
+              <option value="" selected disabled>Select one</option>
+              <option>None</option>
+              <option>Some (informal)</option>
+              <option>1-2 years</option>
+              <option>3+ years</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <label for="availability">Weekly availability (hours)</label>
+            <select id="availability" name="availability" required>
+              <option value="" selected disabled>Select one</option>
+              <option>1-3</option>
+              <option>4-6</option>
+              <option>7-10</option>
+              <option>10+</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <label for="hasTablet">Do you have a tablet + stylus?</label>
+            <select id="hasTablet" name="hasTablet" required>
+              <option value="" selected disabled>Select one</option>
+              <option>Yes</option>
+              <option>No</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <label for="why">Why do you want to tutor with TutorPoint?</label>
+            <textarea id="why" name="why" rows="4" placeholder="Max 500 words" required></textarea>
+          </div>
+
+          <button type="submit" class="button tutor-cta form-submit">
+            Submit application
+          </button>
+          <p id="formStatus" class="form-status hidden"></p>
+
+
+          <p class="form-footnote">
+            By submitting, you agree to be contacted about tests and onboarding.
+          </p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // burger
+    const nav = document.querySelector("nav");
+    const toggle = document.querySelector(".nav-toggle");
+    const menu = document.getElementById("nav-menu");
+
+    toggle?.addEventListener("click", () => {
+      const isOpen = nav.classList.toggle("is-open");
+      toggle.setAttribute("aria-expanded", String(isOpen));
+      toggle.setAttribute("aria-label", isOpen ? "Close menu" : "Open menu");
+    });
+
+    // CTA redirects
+    document.querySelectorAll("button[data-route]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const route = button.dataset.route;
+        if (route) window.location.href = route;
+      });
+    });
+
+    const tutorForm = document.getElementById("tutorForm");
+const statusEl = document.getElementById("formStatus");
+const submitBtn = tutorForm?.querySelector('button[type="submit"]');
+
+let isSubmitting = false;
+
+tutorForm?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  if (isSubmitting) return;
+
+  isSubmitting = true;
+  if (submitBtn) submitBtn.disabled = true;
+
+  statusEl.className = "form-status hidden";
+  statusEl.textContent = "";
+
+  try {
+    const formData = new FormData(tutorForm);
+    const payload = Object.fromEntries(formData.entries());
+
+    const res = await fetch("/api/tutors/apply", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json();
+
+    if (res.ok && data.ok) {
+      statusEl.textContent = "Application submitted successfully. We will be in touch.";
+      statusEl.className = "form-status success";
+      tutorForm.reset();
+    } else {
+      statusEl.textContent = data.error || "Something went wrong. Please try again.";
+      statusEl.className = "form-status error";
+    }
+  } catch {
+    statusEl.textContent = "Network error. Please check your connection and try again.";
+    statusEl.className = "form-status error";
+  } finally {
+    statusEl.classList.remove("hidden");
+    isSubmitting = false;
+    if (submitBtn) submitBtn.disabled = false;
+  }
+});
+
+</script>
+</body>
+</html>

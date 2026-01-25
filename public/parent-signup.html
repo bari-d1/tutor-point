@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" href="/assets/css/palette.css" />
+  <link rel="stylesheet" href="/assets/css/parent-signup.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&display=swap" rel="stylesheet">
+  <title>TutorPoint | Register</title>
+</head>
+<body>
+
+  <header>
+    <nav class="nav">
+      <div class="logo">
+        <a href="/"><img src="/assets/images/logo.svg" alt="TutorPoint logo"></a>
+      </div>
+
+      <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </button>
+
+      <div class="nav-menu" id="nav-menu">
+        <ul class="nav-links">
+          <li><a href="/#hero" style="color: var(--bg-primary); text-decoration:none;">Why Us?</a></li>
+          <li><a href="/#how-it-works" style="color: var(--bg-primary); text-decoration:none;">How it works</a></li>
+          <li><a href="/#faqs" style="color: var(--bg-primary); text-decoration:none;">FAQs</a></li>
+        </ul>
+
+        <div class="nav-cta">
+          <button class="button register-cta" data-route="/register">Register</button>
+          <button class="button tutor-cta" data-route="/tutors/apply">Become a Tutor</button>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main class="page">
+    <section class="page-hero" style="grid-template-columns: 1fr;">
+      <div class="page-hero-left">
+        <h1 class="page-h1">Register Your Child</h1>
+        <p class="page-subtext">
+          Start with a short maths assessment so we can identify gaps, match the right tutor, and measure progress after 3 weeks.
+        </p>
+
+        <div class="page-badges">
+          <div class="badge">WAEC</div>
+          <div class="badge">GCSE</div>
+          <div class="badge">1-to-1 online</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <div class="form-card">
+        <h2 class="form-title">Parent Registration</h2>
+        <p class="form-help">This takes less than 2 minutes.</p>
+
+        <form id="parentForm" class="form" method="post" action="/api/parents/register">
+          <h3 style="margin-top:0.5rem;">Parent details</h3>
+
+          <div class="form-row">
+            <label for="parentName">Full name</label>
+            <input id="parentName" name="parentName" type="text" placeholder="e.g. Ada Obi" required />
+          </div>
+
+          <div class="form-row">
+            <label for="parentEmail">Email</label>
+            <input id="parentEmail" name="parentEmail" type="email" placeholder="e.g. ada@email.com" required />
+          </div>
+
+          <div class="form-row">
+            <label for="parentPhone">Phone number</label>
+            <input id="parentPhone" name="parentPhone" type="tel" placeholder="e.g. +234 801 234 5678" required />
+          </div>
+
+          <div class="form-row">
+            <label for="location">Location (State)</label>
+            <input id="location" name="location" type="text" placeholder="e.g. Lagos" required />
+          </div>
+
+          <h3 style="margin-top:1.25rem;">Child details</h3>
+
+          <div class="form-row">
+            <label for="childName">Child’s name</label>
+            <input id="childName" name="childName" type="text" placeholder="e.g. Timi Obi" required />
+          </div>
+
+          <div class="form-row">
+            <label for="childClass">Class / Level</label>
+            <select id="childClass" name="childClass" required>
+              <option value="" selected disabled>Select one</option>
+              <option>Primary 5</option>
+              <option>Primary 6</option>
+              <option>JSS 1</option>
+              <option>JSS 2</option>
+              <option>JSS 3</option>
+              <option>SSS 1</option>
+              <option>SSS 2</option>
+              <option>SSS 3</option>
+              <option>GCSE</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <label for="examType">Exam focus</label>
+            <select id="examType" name="examType">
+              <!-- <option value="" selected>Optional</option> -->
+              <option>WAEC</option>
+              <option>GCSE</option>
+              <option>NECO</option>
+              <option>Common Entrance</option>
+              <!-- <option>Other</option>s -->
+            </select>
+          </div>
+
+          <div class="form-row">
+            <label for="support">What does your child struggle with most?</label>
+            <textarea id="support" name="support" rows="4"></textarea>
+          </div>
+
+          <button type="submit" class="button register-cta form-submit">
+            Continue
+          </button>
+
+          <p class="form-footnote">
+            By submitting, you agree to be contacted about assessment scheduling.
+          </p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // burger
+    const nav = document.querySelector("nav");
+    const toggle = document.querySelector(".nav-toggle");
+
+    toggle?.addEventListener("click", () => {
+      const isOpen = nav.classList.toggle("is-open");
+      toggle.setAttribute("aria-expanded", String(isOpen));
+      toggle.setAttribute("aria-label", isOpen ? "Close menu" : "Open menu");
+    });
+
+    // CTA redirects
+    document.querySelectorAll("button[data-route]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const route = button.dataset.route;
+        if (route) window.location.href = route;
+      });
+    });
+
+
+
+
+    const parentForm = document.getElementById("parentForm");
+
+parentForm?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  parentForm.querySelector("button[type='submit']").disabled = true;
+
+  const formData = new FormData(parentForm);
+  const payload = Object.fromEntries(formData.entries());
+
+  try {
+    const res = await fetch("/api/parents/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json();
+
+    if (res.ok && data.ok) {
+      // Optional small delay for UX
+      setTimeout(() => {
+        window.location.href = "/?signup=success";
+      }, 400);
+    } else {
+      alert(data.error || "Something went wrong");
+    }
+  } catch (err) {
+    alert("Network error. Please try again.");
+  }
+});
+
+  </script>
+</body>
+</html>
