@@ -7,35 +7,40 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Lead {
-  id String @id @default(cuid())
 
-  // Core
-  type String
-  fullName String
-  email    String
-  phone    String?
-  location String?
-  subject  String?
-  message  String?
+model TutorApplication {
+  id           String   @id @default(cuid())
+  fullName     String
+  email        String
+  phone        String
+  location     String
+  education    String
+  experience   String
+  availability String
+  hasTablet    Boolean
+  why          String
 
-  // Tutor-specific
-  availability String?
-  isNYSC       Boolean?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  // Parent-specific
-  studentYear String?
-  goals       String?
-
-  // Google Sheets sync tracking
-  sheetSyncStatus String   @default("PENDING")
-  sheetSyncedAt   DateTime?
-  sheetLastError  String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([type])
   @@index([email])
-  @@index([sheetSyncStatus])
 }
+model ParentRegistration {
+  id          String   @id @default(cuid())
+
+  parentName  String
+  parentEmail String   @unique
+  parentPhone String
+  location    String
+
+  childName   String
+  childClass  String
+  examType    String?
+  support     String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([parentEmail])
+}
+

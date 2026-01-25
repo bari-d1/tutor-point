@@ -13,11 +13,33 @@
   <script src="https://kit.fontawesome.com/9fc40e56a9.js" crossorigin="anonymous"></script>
   <title>Tutor Point</title>
 </head>
+<div id="toast" class="toast hidden">
+  Application submitted successfully. We’ll be in touch.
+</div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const toast = document.getElementById("toast");
+
+  if (params.get("signup") === "success" && toast) {
+    toast.classList.remove("hidden");
+    toast.classList.add("show");
+
+    // Remove query param from URL (clean URL)
+    window.history.replaceState({}, document.title, "/");
+
+    // Auto-hide after 4 seconds
+    setTimeout(() => {
+      toast.classList.remove("show");
+      toast.classList.add("hidden");
+    }, 4000);
+  }
+</script>
 <body>
   <header>
     <nav class="nav">
       <div class="logo">
-        <img src="/assets/images/logo.svg" alt="logo">
+        <a href="/"><img src="/assets/images/logo.svg" alt="logo"></a>
       </div>
     
       <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
@@ -43,7 +65,7 @@
     
     
   </header>
-  <section id="hero">
+  <section id="hero" class="reveal">
     <div class="hero-left">
       <h1 class="hero-h1">Measure and improve your child's maths in 3 weeks.</h1>
       <p class="hero-description">We start with a maths assessment, deliver targeted online lessons, then re-test to clearly measure your child’s progress. See your child's progress in 3 weeks not 3 terms</p>
@@ -62,7 +84,7 @@
       <!-- <img src="/assets/images/hero.svg" alt="hero-img" class="hero-img"> -->
     </div>
   </section>
-  <section id="why-us" class="why-us">
+  <section id="why-us" class="why-us reveal">
     <br><br>
       <h1 class="section-head">
         What You Get From Us By Registering
@@ -111,7 +133,7 @@
         </div>
       </div>
   </section>
-  <section class="how-it-works" id="how-it-works">
+  <section id="how-it-works" class="how-it-works reveal" >
     <h1 class="section-head" style="margin-top: 5%;">How Do We Work?</h1>
     <div class="how-it-works-parents">
       <h2 class="how-it-works-h2">How Your Child Gets Better</h2>
@@ -176,7 +198,7 @@
     </div>
   </section>
   
-  <section id="faqs">
+  <section id="faqs" class="reveal">
     <div class="faq-left">
       <h1 class="section-head" style="margin-top: 5%; text-align: left;">FAQs</h1>
       <p class="small-info" style="margin-top: 5%;">Popular questiosn being asked by our users</p>
@@ -258,7 +280,7 @@
     </div>
   </section>
 
-  <section id="testimonials">
+  <section id="testimonials" class="reveal">
     <span class="quote">"</span><h1 class="section-head" style="text-align: left;">What People Say About Us</h1>
     <p class="small-info">Popular questions being asked by our users</p>
     <div class="testimonial-container">
@@ -325,7 +347,7 @@
     </div>
   </section>
 
-  <footer>
+  <footer class="reveal">
     <div class="footer-left">
       <div class="footer-logo" style="margin:0;">
         <img src="/assets/images/logo.svg" alt="logo" > 
@@ -452,4 +474,24 @@ document.querySelectorAll("button[data-route]").forEach(button => {
 
 
 </script>
+
+<script>
+  // Reveal on scroll
+  const revealEls = document.querySelectorAll(".reveal");
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          observer.unobserve(entry.target); // animate once
+        }
+      });
+    },
+    { threshold: 0.15 }
+  );
+
+  revealEls.forEach((el) => observer.observe(el));
+</script>
+
 </html>
