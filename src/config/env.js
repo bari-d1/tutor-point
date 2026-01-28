@@ -15,10 +15,10 @@ export const env = {
 
   databaseUrl: required("DATABASE_URL"),
 
-  sheetsId: required("GOOGLE_SHEETS_ID"),
-  tutorTab: process.env.TUTOR_SHEET_TAB_NAME || "Tutors",
-  parentTab: process.env.PARENT_SHEET_TAB_NAME || "Parents",
+  // sheetsId: required("GOOGLE_SHEETS_ID"),
+  // tutorTab: process.env.TUTOR_SHEET_TAB_NAME || "Tutors",
+  // parentTab: process.env.PARENT_SHEET_TAB_NAME || "Parents",
 
-  googleServiceAccountEmail: required("GOOGLE_SERVICE_ACCOUNT_EMAIL"),
-  googlePrivateKey: required("GOOGLE_PRIVATE_KEY")
+  // googleServiceAccountEmail: required("GOOGLE_SERVICE_ACCOUNT_EMAIL"),
+  // googlePrivateKey: required("GOOGLE_PRIVATE_KEY")
 };
