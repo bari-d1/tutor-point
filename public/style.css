@@ -99,12 +99,16 @@ button:hover{ cursor: pointer; }
   justify-content: center;
   gap: 0.5rem;
   padding: 0 1rem;
+  white-space: nowrap;   /* 🔥 prevents wrapping */
+  font-size: 0.95rem;  
 }
+
 
 .register-cta{
   background-color: var(--color-black);
   border: 1px solid var(--bg-primary);
   color: var(--bg-primary);
+  width: fit-content; 
 }
 
 .tutor-cta{
@@ -279,7 +283,7 @@ nav ul{
 
 .tutor-left{
   background-color: var(--border-default);
-  background-image: url("/assets/images/learning.jpg");
+  background-image: url("/assets/images/learning2.jpg");
   margin-top: 5%;
 }
 
