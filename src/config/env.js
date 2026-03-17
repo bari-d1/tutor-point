@@ -13,7 +13,7 @@ export const env = {
   isProd: (process.env.NODE_ENV || "development") === "production",
   port: Number(process.env.PORT || 3000),
 
-  databaseUrl: required("DATABASE_URL"),
+  databaseUrl: required("DATABASE_PRISMA_DATABASE_URL"),
 
   // sheetsId: required("GOOGLE_SHEETS_ID"),
   // tutorTab: process.env.TUTOR_SHEET_TAB_NAME || "Tutors",
