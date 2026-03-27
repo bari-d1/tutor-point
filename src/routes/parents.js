@@ -1,5 +1,6 @@
 import express from "express";
 import { prisma } from "../db/prisma.js";
+import { appendParentRegistration } from "../services/googleSheets.js";
 
 const router = express.Router();
 
@@ -46,6 +47,10 @@ router.post("/register", async (req, res) => {
         support: support ? String(support).trim() : null,
       },
     });
+
+    appendParentRegistration(parent).catch((err) =>
+      console.error("Sheets sync failed (parent):", err)
+    );
 
     return res.status(201).json({ ok: true, parentId: parent.id, redirectTo: "/"});
   } catch (err) {

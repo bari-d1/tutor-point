@@ -1,5 +1,6 @@
 import express from "express";
 import { prisma } from "../db/prisma.js";
+import { appendTutorApplication } from "../services/googleSheets.js";
 
 const router = express.Router();
 
@@ -64,6 +65,10 @@ router.post("/apply", async (req, res) => {
         why: String(why).trim(),
       },
     });
+
+    appendTutorApplication(application).catch((err) =>
+      console.error("Sheets sync failed (tutor):", err)
+    );
 
     return res.status(201).json({ ok: true, applicationId: application.id });
   } catch (err) {
