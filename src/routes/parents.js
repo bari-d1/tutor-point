@@ -48,9 +48,11 @@ router.post("/register", async (req, res) => {
       },
     });
 
-    appendParentRegistration(parent).catch((err) =>
-      console.error("Sheets sync failed (parent):", err)
-    );
+    try {
+      await appendParentRegistration(parent);
+    } catch (err) {
+      console.error("Sheets sync failed (parent):", err);
+    }
 
     return res.status(201).json({ ok: true, parentId: parent.id, redirectTo: "/"});
   } catch (err) {

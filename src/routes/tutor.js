@@ -66,9 +66,11 @@ router.post("/apply", async (req, res) => {
       },
     });
 
-    appendTutorApplication(application).catch((err) =>
-      console.error("Sheets sync failed (tutor):", err)
-    );
+    try {
+      await appendTutorApplication(application);
+    } catch (err) {
+      console.error("Sheets sync failed (tutor):", err);
+    }
 
     return res.status(201).json({ ok: true, applicationId: application.id });
   } catch (err) {
