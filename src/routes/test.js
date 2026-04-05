@@ -79,17 +79,19 @@ router.post("/start/:applicationId", async (req, res) => {
       }
     }
 
-    const existing = await prisma.testSession.findFirst({
-      where: { tutorApplicationId: applicationId, submittedAt: null },
-    });
-
-    if (existing) {
-      const { questions } = existing;
-      return res.json({
-        ok: true,
-        sessionId: existing.id,
-        questions: questions.map(({ correct, answer, ...q }) => q),
+    if (!isTestUser) {
+      const existing = await prisma.testSession.findFirst({
+        where: { tutorApplicationId: applicationId, submittedAt: null },
       });
+
+      if (existing) {
+        const { questions } = existing;
+        return res.json({
+          ok: true,
+          sessionId: existing.id,
+          questions: questions.map(({ correct, answer, ...q }) => q),
+        });
+      }
     }
 
     const selected = loadQuestions();
