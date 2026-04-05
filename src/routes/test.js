@@ -61,10 +61,6 @@ router.post("/start/:applicationId", async (req, res) => {
       return res.status(404).json({ ok: false, error: "Application not found", redirect404: true });
     }
 
-    await prisma.tutorApplication.update({
-      where: { id: applicationId },
-      data: { testName: String(name).trim() },
-    });
 
     const TEST_USER_ID = "test-dev-entry-001";
     const isTestUser = applicationId === TEST_USER_ID;
@@ -99,6 +95,7 @@ router.post("/start/:applicationId", async (req, res) => {
     const session = await prisma.testSession.create({
       data: {
         tutorApplicationId: applicationId,
+        testName: String(name).trim(),
         questions: selected,
         total: selected.length,
       },

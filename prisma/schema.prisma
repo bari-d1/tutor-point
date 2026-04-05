@@ -33,6 +33,7 @@ model TestSession {
   id                  String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   tutorApplicationId  String    @map("tutor_application_id")
   tutorApplication    TutorApplication @relation(fields: [tutorApplicationId], references: [id], onDelete: Cascade)
+  testName            String?   @map("test_name")
   questions           Json
   answers             Json?
   score               Int?

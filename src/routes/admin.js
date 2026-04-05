@@ -21,14 +21,14 @@ router.get("/results", requireToken, async (req, res) => {
     const sessions = await prisma.testSession.findMany({
       where:   { submittedAt: { not: null } },
       orderBy: { submittedAt: "desc" },
-      include: { tutorApplication: { select: { fullName: true, email: true, testName: true } } },
+      include: { tutorApplication: { select: { fullName: true, email: true } } },
     });
 
     const rows = sessions.map((s) => ({
       sessionId:         s.id,
       applicationId:     s.tutorApplicationId,
       applicantName:     s.tutorApplication?.fullName ?? "—",
-      testName:          s.tutorApplication?.testName ?? "—",
+      testName:          s.testName ?? "—",
       email:             s.tutorApplication?.email ?? "—",
       submittedAt:       s.submittedAt,
       score:             s.score,
