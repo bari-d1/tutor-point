@@ -40,6 +40,10 @@ app.get("/tutors/apply", (req, res) => {
 });
 
 
+app.get("/admin/results", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "admin", "results.html"));
+});
+
 // Basic health
 app.get("/health", (req, res) => res.json({ ok: true }));
 

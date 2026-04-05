@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Skills Test — TutorPoint</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="shortcut icon" href="/favicon.ico" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --yellow: #FFEB3C;
+      --black: #2A2A2A;
+      --white: #EEEEEE;
+      --gray: #EDEDEC;
+      --radius: 16px;
+      --header-h: 68px;
+    }
+
+    body {
+      font-family: "Bricolage Grotesque", sans-serif;
+      background: var(--white);
+      color: var(--black);
+      min-height: 100vh;
+    }
+
+    /* ── LOADING / ERROR STATES ── */
+    #loading, #error-screen, #result-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      gap: 1rem;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    #error-screen h2 { color: #c0392b; }
+    #error-screen p  { color: #555; max-width: 440px; }
+
+    .spinner {
+      width: 44px; height: 44px;
+      border: 4px solid var(--gray);
+      border-top-color: var(--black);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── STICKY HEADER ── */
+    #test-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--black);
+      color: var(--white);
+      height: var(--header-h);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      gap: 1rem;
+    }
+
+    .header-logo {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--yellow);
+      white-space: nowrap;
+    }
+
+    .header-meta {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .exam-badge {
+      background: var(--yellow);
+      color: var(--black);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 999px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .q-counter {
+      font-size: 0.85rem;
+      opacity: 0.75;
+      white-space: nowrap;
+    }
+
+    #timer {
+      font-size: 1rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
+
+    #timer.urgent { color: #ff6b6b; }
+
+    /* ── PROGRESS BAR ── */
+    #progress-wrap {
+      height: 4px;
+      background: var(--gray);
+      position: sticky;
+      top: var(--header-h);
+      z-index: 99;
+    }
+
+    #progress-bar {
+      height: 100%;
+      background: var(--yellow);
+      transition: width 0.3s ease;
+      width: 0%;
+    }
+
+    /* ── MAIN CONTENT ── */
+    #test-body {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 6rem;
+    }
+
+    /* ── QUESTION CARD ── */
+    .question-card {
+      background: #fff;
+      border: 1.5px solid var(--gray);
+      border-radius: var(--radius);
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .q-meta {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #888;
+      margin-bottom: 0.75rem;
+    }
+
+    .q-text {
+      font-size: 1.1rem;
+      line-height: 1.65;
+      font-weight: 500;
+      margin-bottom: 1.5rem;
+    }
+
+    /* ── MCQ OPTIONS ── */
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .option-label {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      border: 1.5px solid var(--gray);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      font-size: 0.95rem;
+    }
+
+    .option-label:hover { border-color: var(--black); background: #f9f9f7; }
+
+    .option-label input[type="radio"] { display: none; }
+
+    .option-label.selected {
+      border-color: var(--black);
+      background: var(--yellow);
+      font-weight: 600;
+    }
+
+    .option-key {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      border: 1.5px solid currentColor;
+      font-size: 0.75rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    /* ── FREE ANSWER ── */
+    .free-answer-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .format-tip {
+      background: #fffbea;
+      border: 1.5px solid #ffe066;
+      border-radius: 8px;
+      padding: 0.6rem 0.9rem;
+      font-size: 0.8rem;
+      line-height: 1.5;
+      color: #7a6800;
+    }
+
+    .format-tip strong { display: block; margin-bottom: 0.25rem; }
+
+    textarea.free-input {
+      width: 100%;
+      min-height: 120px;
+      border: 1.5px solid var(--gray);
+      border-radius: 10px;
+      padding: 0.75rem 1rem;
+      font-family: inherit;
+      font-size: 0.95rem;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    textarea.free-input:focus { border-color: var(--black); }
+
+    /* ── NAV BUTTONS ── */
+    .nav-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 44px;
+      padding: 0 1.5rem;
+      border-radius: 999px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1.5px solid var(--black);
+      background: transparent;
+      color: var(--black);
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .btn:hover { background: var(--black); color: var(--white); }
+    .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .btn-primary {
+      background: var(--black);
+      color: var(--yellow);
+      border-color: var(--black);
+    }
+    .btn-primary:hover { background: #111; }
+
+    .btn-submit {
+      background: var(--yellow);
+      color: var(--black);
+      border-color: var(--yellow);
+    }
+    .btn-submit:hover { background: #f0da00; }
+
+    /* ── RESULT SCREEN ── */
+    #result-screen {
+      gap: 1.25rem;
+    }
+
+    .result-card {
+      background: #fff;
+      border: 1.5px solid var(--gray);
+      border-radius: var(--radius);
+      padding: 2.5rem 2rem;
+      max-width: 460px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .result-score {
+      font-size: 3.5rem;
+      font-weight: 800;
+      line-height: 1;
+      margin: 0.5rem 0;
+    }
+
+    .result-label { font-size: 0.85rem; color: #888; margin-bottom: 0.25rem; }
+    .result-verdict { font-size: 1.1rem; font-weight: 700; margin-top: 0.75rem; }
+    .result-verdict.pass { color: #1f9d55; }
+    .result-verdict.fail { color: #c0392b; }
+
+    /* ── DIALOG ── */
+    #confirm-dialog {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    #confirm-dialog.open { display: flex; }
+
+    .dialog-box {
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 2rem;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .dialog-box h3 { margin-bottom: 0.5rem; }
+    .dialog-box p  { font-size: 0.9rem; color: #555; margin-bottom: 1.5rem; }
+
+    .dialog-actions {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+    }
+
+    /* ── GATE SCREEN ── */
+    #gate-screen {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 2rem;
+      background: var(--white);
+    }
+
+    .gate-card {
+      background: #fff;
+      border: 1.5px solid var(--gray);
+      border-radius: var(--radius);
+      padding: 2.5rem 2rem;
+      max-width: 420px;
+      width: 100%;
+    }
+
+    .gate-logo {
+      background: var(--black);
+      display: inline-flex;
+      align-items: center;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      margin-bottom: 1.25rem;
+    }
+
+    .gate-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+    }
+
+    .gate-sub {
+      font-size: 0.88rem;
+      color: #666;
+      margin-bottom: 1.75rem;
+      line-height: 1.55;
+    }
+
+    .gate-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      margin-bottom: 1rem;
+    }
+
+    .gate-field label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--black);
+    }
+
+    .gate-field input {
+      height: 44px;
+      border: 1.5px solid var(--gray);
+      border-radius: 10px;
+      padding: 0 1rem;
+      font-family: inherit;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .gate-field input:focus { border-color: var(--black); }
+
+    .gate-error {
+      font-size: 0.85rem;
+      color: #c0392b;
+      margin-bottom: 0.75rem;
+    }
+
+    .gate-btn {
+      width: 100%;
+      margin-top: 0.5rem;
+      border-radius: 10px;
+      height: 48px;
+      font-size: 1rem;
+    }
+
+    /* ── HIDDEN ── */
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<!-- Gate screen -->
+<div id="gate-screen">
+  <div class="gate-card">
+    <div class="gate-logo"><img src="/assets/images/logo.svg" alt="TutorPoint" style="height:32px;display:block;" /></div>
+    <h2 class="gate-title">Skills Assessment</h2>
+    <p class="gate-sub">Enter your name and the password you were given to begin.</p>
+    <form id="gate-form">
+      <div class="gate-field">
+        <label for="gate-name">Full name</label>
+        <input id="gate-name" type="text" placeholder="e.g. Amaka Obi" autocomplete="name" required />
+      </div>
+      <div class="gate-field">
+        <label for="gate-password">Password</label>
+        <input id="gate-password" type="text" autocomplete="off" required />
+      </div>
+      <p id="gate-error" class="gate-error hidden"></p>
+      <button class="btn btn-primary gate-btn" type="submit">Start test →</button>
+    </form>
+  </div>
+</div>
+
+<!-- Loading -->
+<div id="loading" class="hidden">
+  <div class="spinner"></div>
+  <p>Loading your test…</p>
+</div>
+
+<!-- Error -->
+<div id="error-screen" class="hidden">
+  <h2>Something went wrong</h2>
+  <p id="error-msg">Unable to load the test. Please check your link and try again.</p>
+</div>
+
+<!-- Test UI (hidden until loaded) -->
+<div id="test-ui" class="hidden">
+
+  <header id="test-header">
+    <div class="header-logo"><img src="/assets/images/logo.svg" alt="TutorPoint" style="height:28px;display:block;" /></div>
+    <div class="header-meta">
+      <span id="exam-badge" class="exam-badge">—</span>
+      <span id="q-counter" class="q-counter">Q 1 / 40</span>
+      <span id="timer">75:00</span>
+    </div>
+  </header>
+
+  <div id="progress-wrap">
+    <div id="progress-bar"></div>
+  </div>
+
+  <main id="test-body">
+    <div class="question-card" id="question-card">
+      <div class="q-meta" id="q-meta"></div>
+      <div class="q-text" id="q-text"></div>
+      <div id="q-input"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn" id="btn-prev">← Previous</button>
+      <button class="btn btn-submit" id="btn-submit">Submit Test</button>
+      <button class="btn btn-primary" id="btn-next">Next →</button>
+    </div>
+  </main>
+</div>
+
+<!-- Result screen -->
+<div id="result-screen" class="hidden">
+  <div class="result-card">
+    <div class="result-label">Your score</div>
+    <div class="result-score" id="res-score">—</div>
+    <div class="result-label" id="res-fraction"></div>
+    <div class="result-verdict" id="res-verdict"></div>
+  </div>
+  <p style="color:#888; font-size:0.85rem;">You can now close this window.</p>
+</div>
+
+<!-- Confirm dialog -->
+<div id="confirm-dialog" role="dialog" aria-modal="true">
+  <div class="dialog-box">
+    <h3>Submit test?</h3>
+    <p id="dialog-msg">Once submitted you cannot change your answers.</p>
+    <div class="dialog-actions">
+      <button class="btn" id="dialog-cancel">Go back</button>
+      <button class="btn btn-submit" id="dialog-submit-anyway">Submit anyway</button>
+      <button class="btn btn-primary" id="dialog-confirm">Yes, submit</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  // ── State ──────────────────────────────────────────────
+  const params   = new URLSearchParams(location.search);
+  const appId    = params.get("tutor_application_id");
+
+  let sessionId  = null;
+  let questions  = [];
+  let answers    = {};   // { [questionId]: string }
+  let current    = 0;
+  let timerSecs  = 75 * 60;
+  let timerInterval = null;
+  let submitted  = false;
+
+  // ── DOM refs ───────────────────────────────────────────
+  const $loading   = document.getElementById("loading");
+  const $error     = document.getElementById("error-screen");
+  const $errorMsg  = document.getElementById("error-msg");
+  const $testUi    = document.getElementById("test-ui");
+  const $result    = document.getElementById("result-screen");
+
+  const $badge     = document.getElementById("exam-badge");
+  const $counter   = document.getElementById("q-counter");
+  const $timer     = document.getElementById("timer");
+  const $bar       = document.getElementById("progress-bar");
+
+  const $qMeta     = document.getElementById("q-meta");
+  const $qText     = document.getElementById("q-text");
+  const $qInput    = document.getElementById("q-input");
+
+  const $btnPrev   = document.getElementById("btn-prev");
+  const $btnNext   = document.getElementById("btn-next");
+  const $btnSubmit = document.getElementById("btn-submit");
+
+  const $dialog    = document.getElementById("confirm-dialog");
+  const $dialogMsg = document.getElementById("dialog-msg");
+  const $dlgCancel      = document.getElementById("dialog-cancel");
+  const $dlgOk          = document.getElementById("dialog-confirm");
+  const $dlgSubmitAnyway = document.getElementById("dialog-submit-anyway");
+
+  // ── Helpers ────────────────────────────────────────────
+  function show(el)  { el.classList.remove("hidden"); }
+  function hide(el)  { el.classList.add("hidden"); }
+
+  function fmtTime(s) {
+    const m = Math.floor(s / 60).toString().padStart(2, "0");
+    const sec = (s % 60).toString().padStart(2, "0");
+    return `${m}:${sec}`;
+  }
+
+  function examBoard(q) {
+    if (q.source?.toUpperCase().includes("IGCSE") || q.source?.toUpperCase().includes("CAMBRIDGE")) return "IGCSE";
+    if (q.source?.toUpperCase().includes("JAMB"))  return "JAMB";
+    if (q.source?.toUpperCase().includes("NECO"))  return "NECO";
+    if (q.source?.toUpperCase().includes("WAEC"))  return "WAEC";
+    return q.source ?? "—";
+  }
+
+  function isMCQ(q) { return !!(q.optionA || q.optionB); }
+
+  function answeredCount() {
+    return questions.filter(q => {
+      const a = answers[q.id];
+      return a !== undefined && String(a).trim() !== "";
+    }).length;
+  }
+
+  // ── Render question ────────────────────────────────────
+  function render() {
+    const q   = questions[current];
+    const tot = questions.length;
+
+    // header
+    $badge.textContent   = examBoard(q);
+    $counter.textContent = `Q ${current + 1} / ${tot}`;
+
+    // progress
+    const pct = (answeredCount() / tot) * 100;
+    $bar.style.width = pct + "%";
+
+    // question meta
+    $qMeta.textContent = `${q.source ?? ""} · ${q.topic ?? ""}`.replace(/^ · | · $/g, "");
+    $qText.textContent = q.question;
+
+    // nav buttons
+    $btnPrev.disabled = current === 0;
+    $btnNext.disabled = current === tot - 1;
+
+    // input area
+    $qInput.innerHTML = "";
+
+    if (isMCQ(q)) {
+      const opts = ["A","B","C","D"].map(k => ({ key: k, text: q[`option${k}`] })).filter(o => o.text);
+      const list = document.createElement("div");
+      list.className = "options-list";
+
+      opts.forEach(({ key, text }) => {
+        const lbl = document.createElement("label");
+        lbl.className = "option-label" + (answers[q.id] === key ? " selected" : "");
+
+        const radio = document.createElement("input");
+        radio.type  = "radio";
+        radio.name  = "mcq";
+        radio.value = key;
+        radio.checked = answers[q.id] === key;
+
+        const keySpan = document.createElement("span");
+        keySpan.className   = "option-key";
+        keySpan.textContent = key;
+
+        const txt = document.createElement("span");
+        txt.textContent = text;
+
+        lbl.appendChild(radio);
+        lbl.appendChild(keySpan);
+        lbl.appendChild(txt);
+
+        lbl.addEventListener("click", () => {
+          answers[q.id] = key;
+          render();
+        });
+
+        list.appendChild(lbl);
+      });
+
+      $qInput.appendChild(list);
+
+    } else {
+      // Free answer
+      const wrap = document.createElement("div");
+      wrap.className = "free-answer-wrap";
+
+      const tip = document.createElement("div");
+      tip.className = "format-tip";
+      tip.innerHTML = `<strong>Formatting guidelines (always visible)</strong>
+Use plain text. For fractions write e.g. <code>3/4</code>. For powers write e.g. <code>x^2</code>. For roots write e.g. <code>sqrt(9)</code>. Separate multiple values with commas. Match the exact form shown in the question. Your answer will be marked wrong if it does not follow this convention.`;
+
+      const ta = document.createElement("textarea");
+      ta.className   = "free-input";
+      ta.placeholder = "Type your answer here…";
+      ta.value       = answers[q.id] ?? "";
+
+      ta.addEventListener("input", () => {
+        answers[q.id] = ta.value;
+        const pct2 = (answeredCount() / tot) * 100;
+        $bar.style.width = pct2 + "%";
+      });
+
+      wrap.appendChild(tip);
+      wrap.appendChild(ta);
+      $qInput.appendChild(wrap);
+    }
+  }
+
+  // ── Timer ──────────────────────────────────────────────
+  function startTimer() {
+    timerInterval = setInterval(() => {
+      timerSecs--;
+      $timer.textContent = fmtTime(timerSecs);
+      $timer.classList.toggle("urgent", timerSecs <= 5 * 60);
+
+      if (timerSecs <= 0) {
+        clearInterval(timerInterval);
+        doSubmit(true);
+      }
+    }, 1000);
+  }
+
+  // ── Gate form ──────────────────────────────────────────
+  const $gateScreen  = document.getElementById("gate-screen");
+  const $gateForm    = document.getElementById("gate-form");
+  const $gateName    = document.getElementById("gate-name");
+  const $gatePass    = document.getElementById("gate-password");
+  const $gateError   = document.getElementById("gate-error");
+  const $gateBtn     = $gateForm.querySelector("button[type=submit]");
+
+  $gateForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    $gateError.classList.add("hidden");
+    $gateBtn.disabled = true;
+    $gateBtn.textContent = "Starting…";
+    await loadTest($gateName.value.trim(), $gatePass.value.trim());
+    $gateBtn.disabled = false;
+    $gateBtn.textContent = "Start test →";
+  });
+
+  // ── Load test ──────────────────────────────────────────
+  async function loadTest(name, password) {
+    if (!appId) {
+      showError("No tutor_application_id found in the URL. Please use the link sent to you.");
+      return;
+    }
+
+    try {
+      hide($gateScreen);
+      show($loading);
+
+      const res  = await fetch(`/api/tutors/test/start/${encodeURIComponent(appId)}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, password }),
+      });
+      const data = await res.json();
+
+      if (!res.ok || !data.ok) {
+        if (data.redirect404) {
+          window.location.href = "/404.html";
+          return;
+        }
+        hide($loading);
+        show($gateScreen);
+        $gateError.textContent = data.error ?? "Failed to start test.";
+        $gateError.classList.remove("hidden");
+        return;
+      }
+
+      sessionId = data.sessionId;
+      questions = data.questions;
+
+      hide($loading);
+      show($testUi);
+      render();
+      startTimer();
+
+    } catch (e) {
+      hide($loading);
+      show($gateScreen);
+      $gateError.textContent = "Network error. Please check your connection and try again.";
+      $gateError.classList.remove("hidden");
+    }
+  }
+
+  function showError(msg) {
+    hide($loading);
+    $errorMsg.textContent = msg;
+    show($error);
+  }
+
+  // ── Submit ─────────────────────────────────────────────
+  async function doSubmit(auto = false) {
+    if (submitted) return;
+    submitted = true;
+    clearInterval(timerInterval);
+
+    try {
+      const res  = await fetch("/api/tutors/test/submit", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ session_id: sessionId, answers }),
+      });
+      const data = await res.json();
+
+      hide($testUi);
+      show($result);
+
+      if (!res.ok || !data.ok) {
+        document.getElementById("res-score").textContent   = "—";
+        document.getElementById("res-fraction").textContent = data.error ?? "Submission error";
+        document.getElementById("res-verdict").textContent  = "";
+        return;
+      }
+
+      document.getElementById("res-score").textContent    = data.percentage + "%";
+      document.getElementById("res-fraction").textContent = `${data.score} / ${data.total} correct`;
+      const verdict = document.getElementById("res-verdict");
+      verdict.textContent  = data.passed ? "You passed!" : "Better luck next time.";
+      verdict.className    = "result-verdict " + (data.passed ? "pass" : "fail");
+
+    } catch {
+      hide($testUi);
+      show($result);
+      document.getElementById("res-score").textContent    = "—";
+      document.getElementById("res-fraction").textContent = "Network error — please contact support.";
+      document.getElementById("res-verdict").textContent  = "";
+    }
+  }
+
+  // ── Navigation ─────────────────────────────────────────
+  $btnPrev.addEventListener("click", () => { if (current > 0)                  { current--; render(); } });
+  $btnNext.addEventListener("click", () => { if (current < questions.length-1) { current++; render(); } });
+
+  $btnSubmit.addEventListener("click", () => {
+    const unanswered = questions.length - answeredCount();
+    if (unanswered > 0) {
+      $dialogMsg.textContent = `You have ${unanswered} unanswered question${unanswered > 1 ? "s" : ""}. Go back to answer them, or submit anyway.`;
+      $dlgOk.classList.add("hidden");
+      $dlgSubmitAnyway.classList.remove("hidden");
+    } else {
+      $dialogMsg.textContent = "Once submitted you cannot change your answers.";
+      $dlgOk.classList.remove("hidden");
+      $dlgSubmitAnyway.classList.add("hidden");
+    }
+    $dialog.classList.add("open");
+  });
+
+  $dlgCancel.addEventListener("click", () => {
+    $dialog.classList.remove("open");
+    const firstUnanswered = questions.findIndex(q => {
+      const a = answers[q.id];
+      return a === undefined || String(a).trim() === "";
+    });
+    if (firstUnanswered !== -1) {
+      current = firstUnanswered;
+      render();
+    }
+  });
+
+  $dlgSubmitAnyway.addEventListener("click", () => { $dialog.classList.remove("open"); doSubmit(); });
+  $dlgOk.addEventListener("click",           () => { $dialog.classList.remove("open"); doSubmit(); });
+
+  // close dialog on backdrop click
+  $dialog.addEventListener("click", (e) => { if (e.target === $dialog) $dialog.classList.remove("open"); });
+
+  // ── Boot ───────────────────────────────────────────────
+  if (!appId) window.location.href = "/404.html";
+})();
+</script>
+</body>
+</html>

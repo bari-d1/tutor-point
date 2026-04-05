@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url = env("DATABASE_PRISMA_DATABASE_URL")
+  url      = env("DATABASE_PRISMA_DATABASE_URL")
 }
 
 
@@ -20,11 +20,30 @@ model TutorApplication {
   hasTablet    Boolean
   why          String
 
+  testName     String?
+
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
+  testSessions TestSession[]
+
   @@index([email])
 }
+model TestSession {
+  id                  String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tutorApplicationId  String    @map("tutor_application_id")
+  tutorApplication    TutorApplication @relation(fields: [tutorApplicationId], references: [id], onDelete: Cascade)
+  questions           Json
+  answers             Json?
+  score               Int?
+  total               Int       @default(40)  @map("total")
+  startedAt           DateTime  @default(now()) @map("started_at")
+  submittedAt         DateTime? @map("submitted_at")
+
+  @@index([tutorApplicationId])
+  @@map("test_sessions")
+}
+
 model ParentRegistration {
   id          String   @id @default(cuid())
 

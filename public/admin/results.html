@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Results — TutorPoint Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --yellow: #FFEB3C;
+      --black:  #2A2A2A;
+      --white:  #EEEEEE;
+      --gray:   #EDEDEC;
+      --pass:   #1f9d55;
+      --fail:   #c0392b;
+      --radius: 12px;
+    }
+
+    body {
+      font-family: "Bricolage Grotesque", sans-serif;
+      background: var(--white);
+      color: var(--black);
+      min-height: 100vh;
+    }
+
+    /* ── AUTH GATE ── */
+    #auth-screen {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    .auth-card {
+      background: #fff;
+      border: 1.5px solid var(--gray);
+      border-radius: var(--radius);
+      padding: 2.5rem 2rem;
+      max-width: 380px;
+      width: 100%;
+    }
+
+    .auth-card h2 { font-size: 1.25rem; margin-bottom: 0.25rem; }
+    .auth-card p  { font-size: 0.85rem; color: #666; margin-bottom: 1.5rem; }
+
+    .field { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 1rem; }
+    .field label { font-size: 0.8rem; font-weight: 600; }
+    .field input {
+      height: 42px;
+      border: 1.5px solid var(--gray);
+      border-radius: 8px;
+      padding: 0 0.9rem;
+      font-family: inherit;
+      font-size: 0.95rem;
+      outline: none;
+    }
+    .field input:focus { border-color: var(--black); }
+
+    .auth-error { font-size: 0.83rem; color: var(--fail); margin-bottom: 0.75rem; }
+
+    /* ── SHARED BUTTON ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 40px;
+      padding: 0 1.25rem;
+      border-radius: 999px;
+      font-family: inherit;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1.5px solid var(--black);
+      background: var(--black);
+      color: var(--yellow);
+      transition: background 0.15s;
+      text-decoration: none;
+    }
+    .btn:hover { background: #111; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-outline { background: transparent; color: var(--black); }
+    .btn-outline:hover { background: var(--black); color: var(--yellow); }
+    .btn-full { width: 100%; border-radius: 8px; height: 44px; font-size: 0.95rem; }
+
+    /* ── MAIN ── */
+    #main-screen { display: none; }
+
+    header.admin-header {
+      background: var(--black);
+      color: var(--yellow);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      height: 60px;
+    }
+
+    .admin-header-logo { font-weight: 800; font-size: 1rem; background-color: black; }
+    .admin-header-right { display: flex; gap: 0.75rem; align-items: center; }
+
+    main.admin-main { padding: 2rem; max-width: 1200px; margin: 0 auto; }
+
+    h1.page-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.25rem; }
+    .page-sub { font-size: 0.85rem; color: #666; margin-bottom: 1.5rem; }
+
+    /* ── TABLE ── */
+    .table-wrap {
+      overflow-x: auto;
+      background: #fff;
+      border: 1.5px solid var(--gray);
+      border-radius: var(--radius);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+
+    th {
+      background: var(--black);
+      color: var(--yellow);
+      padding: 0.75rem 1rem;
+      text-align: left;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--gray);
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #f9f9f7; }
+
+    .badge-pass { color: var(--pass); font-weight: 700; }
+    .badge-fail { color: var(--fail); font-weight: 700; }
+
+    /* ── MODAL ── */
+    #modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 100;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 2rem 1rem;
+      overflow-y: auto;
+    }
+
+    #modal-overlay.open { display: flex; }
+
+    .modal {
+      background: #fff;
+      border-radius: var(--radius);
+      width: 100%;
+      max-width: 760px;
+      overflow: hidden;
+      margin: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 1.5rem;
+      background: var(--black);
+      color: var(--yellow);
+    }
+
+    .modal-header h3 { font-size: 1rem; }
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--yellow);
+      font-size: 1.4rem;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .modal-body { padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+
+    .q-row {
+      border: 1.5px solid var(--gray);
+      border-radius: 10px;
+      padding: 1rem;
+    }
+
+    .q-row-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .q-num {
+      font-size: 0.72rem;
+      font-weight: 700;
+      background: var(--gray);
+      border-radius: 999px;
+      padding: 2px 8px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .q-text { font-size: 0.9rem; line-height: 1.55; font-weight: 500; }
+
+    .q-answers {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      font-size: 0.83rem;
+    }
+
+    .answer-box {
+      padding: 0.5rem 0.75rem;
+      border-radius: 8px;
+      border: 1.5px solid var(--gray);
+    }
+
+    .answer-box label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: #888; display: block; margin-bottom: 2px; }
+
+    .correct-box   { border-color: var(--pass); background: #f0fff6; }
+    .incorrect-box { border-color: var(--fail); background: #fff5f5; }
+    .neutral-box   { border-color: var(--gray); }
+
+    .verdict { font-size: 1.1rem; margin-left: 0.25rem; }
+
+    /* ── LOADING / EMPTY ── */
+    .state-msg {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: #888;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Auth gate -->
+<div id="auth-screen">
+  <div class="auth-card">
+    <h2>Admin Login</h2>
+    <p>Enter your admin token to view results.</p>
+    <div class="field">
+      <label for="token-input">Token</label>
+      <input id="token-input" type="password" placeholder="••••••••" />
+    </div>
+    <p id="auth-error" class="auth-error" style="display:none"></p>
+    <button class="btn btn-full" id="auth-btn">Sign in</button>
+  </div>
+</div>
+
+<!-- Main -->
+<div id="main-screen">
+  <header class="admin-header">
+    <div class="admin-header-logo"><img src="/assets/images/logo.svg" alt="TutorPoint" style="height:28px;display:block;" /></div>
+    <div class="admin-header-right">
+      <button class="btn btn-outline" id="csv-btn" style="border-color:var(--yellow);color:var(--yellow);">Export CSV</button>
+      <button class="btn btn-outline" id="refresh-btn" style="border-color:var(--yellow);color:var(--yellow);">Refresh</button>
+    </div>
+  </header>
+
+  <main class="admin-main">
+    <h1 class="page-title">Test Results</h1>
+    <p class="page-sub" id="result-count">Loading…</p>
+
+    <div class="table-wrap">
+      <table id="results-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name (entered)</th>
+            <th>Applicant name</th>
+            <th>Email</th>
+            <th>Submitted</th>
+            <th>Score</th>
+            <th>%</th>
+            <th>Pass/Fail</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="results-body">
+          <tr><td colspan="9" class="state-msg">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<!-- Modal -->
+<div id="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-title">Answers</h3>
+      <button class="modal-close" id="modal-close-btn">×</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+(() => {
+  let token    = "";
+  let allData  = [];
+
+  const $authScreen  = document.getElementById("auth-screen");
+  const $mainScreen  = document.getElementById("main-screen");
+  const $authBtn     = document.getElementById("auth-btn");
+  const $authError   = document.getElementById("auth-error");
+  const $tokenInput  = document.getElementById("token-input");
+  const $tbody       = document.getElementById("results-body");
+  const $count       = document.getElementById("result-count");
+  const $csvBtn      = document.getElementById("csv-btn");
+  const $refreshBtn  = document.getElementById("refresh-btn");
+  const $overlay     = document.getElementById("modal-overlay");
+  const $modalTitle  = document.getElementById("modal-title");
+  const $modalBody   = document.getElementById("modal-body");
+  const $modalClose  = document.getElementById("modal-close-btn");
+
+  // ── Auth ──────────────────────────────────────────────
+  $tokenInput.addEventListener("keydown", (e) => { if (e.key === "Enter") $authBtn.click(); });
+
+  $authBtn.addEventListener("click", async () => {
+    const t = $tokenInput.value.trim();
+    if (!t) return;
+    $authBtn.disabled = true;
+    $authError.style.display = "none";
+
+    const ok = await loadResults(t);
+    if (ok) {
+      token = t;
+      $authScreen.style.display = "none";
+      $mainScreen.style.display = "block";
+    } else {
+      $authError.textContent = "Invalid token.";
+      $authError.style.display = "block";
+    }
+    $authBtn.disabled = false;
+  });
+
+  // ── Load results ──────────────────────────────────────
+  async function loadResults(t) {
+    try {
+      const res  = await fetch("/api/admin/results", {
+        headers: { Authorization: `Bearer ${t}` },
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) return false;
+
+      allData = data.results;
+      renderTable(allData);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  $refreshBtn.addEventListener("click", () => loadResults(token));
+
+  // ── Render table ──────────────────────────────────────
+  function fmt(dateStr) {
+    return new Date(dateStr).toLocaleString("en-GB", {
+      day: "2-digit", month: "short", year: "numeric",
+      hour: "2-digit", minute: "2-digit",
+    });
+  }
+
+  function renderTable(rows) {
+    $count.textContent = `${rows.length} submission${rows.length !== 1 ? "s" : ""}`;
+
+    if (!rows.length) {
+      $tbody.innerHTML = `<tr><td colspan="9" class="state-msg">No submissions yet.</td></tr>`;
+      return;
+    }
+
+    $tbody.innerHTML = rows.map((r, i) => `
+      <tr>
+        <td>${i + 1}</td>
+        <td>${esc(r.testName)}</td>
+        <td>${esc(r.applicantName)}</td>
+        <td>${esc(r.email)}</td>
+        <td>${fmt(r.submittedAt)}</td>
+        <td>${r.score} / ${r.total}</td>
+        <td>${r.percentage}%</td>
+        <td class="${r.passed ? "badge-pass" : "badge-fail"}">${r.passed ? "✓ Pass" : "✗ Fail"}</td>
+        <td><button class="btn btn-outline" style="height:32px;font-size:0.78rem;padding:0 0.9rem" data-idx="${i}">View answers</button></td>
+      </tr>
+    `).join("");
+
+    $tbody.querySelectorAll("button[data-idx]").forEach((btn) => {
+      btn.addEventListener("click", () => openModal(allData[+btn.dataset.idx]));
+    });
+  }
+
+  function esc(s) {
+    return String(s ?? "—").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  }
+
+  // ── Modal ─────────────────────────────────────────────
+  function openModal(row) {
+    $modalTitle.textContent = `${row.testName} — ${row.score}/${row.total} (${row.percentage}%)`;
+
+    const questions = row.questions ?? [];
+    const answers   = row.answers   ?? {};
+
+    $modalBody.innerHTML = questions.map((q, i) => {
+      const isMCQ    = !!(q.optionA || q.optionB);
+      const correct  = isMCQ ? q.correct : q.answer;
+      const submitted = String(answers[q.id] ?? "").trim();
+      const isCorrect = submitted.toLowerCase() === String(correct ?? "").trim().toLowerCase();
+      const verdict  = submitted ? (isCorrect ? "✅" : "❌") : "—";
+
+      return `
+        <div class="q-row">
+          <div class="q-row-header">
+            <span class="q-num">Q${i + 1} · ${q.source ?? ""}</span>
+            <span class="q-text">${esc(q.question)}</span>
+          </div>
+          <div class="q-answers">
+            <div class="answer-box ${submitted ? (isCorrect ? "correct-box" : "incorrect-box") : "neutral-box"}">
+              <label>Tutor's answer</label>
+              <span>${esc(submitted || "No answer")} <span class="verdict">${verdict}</span></span>
+            </div>
+            <div class="answer-box correct-box">
+              <label>Correct answer</label>
+              <span>${esc(correct ?? "—")}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    $overlay.classList.add("open");
+  }
+
+  $modalClose.addEventListener("click", () => $overlay.classList.remove("open"));
+  $overlay.addEventListener("click", (e) => { if (e.target === $overlay) $overlay.classList.remove("open"); });
+
+  // ── CSV export ────────────────────────────────────────
+  $csvBtn.addEventListener("click", () => {
+    if (!allData.length) return;
+
+    const headers = ["#","Name (entered)","Applicant name","Email","Submitted","Score","Total","Percentage","Pass/Fail","Session ID"];
+    const rows = allData.map((r, i) => [
+      i + 1,
+      r.testName,
+      r.applicantName,
+      r.email,
+      new Date(r.submittedAt).toISOString(),
+      r.score,
+      r.total,
+      r.percentage + "%",
+      r.passed ? "Pass" : "Fail",
+      r.sessionId,
+    ].map(v => `"${String(v ?? "").replace(/"/g, '""')}"`).join(","));
+
+    const csv  = [headers.join(","), ...rows].join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href     = url;
+    a.download = `tutorpoint-results-${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+})();
+</script>
+</body>
+</html>
