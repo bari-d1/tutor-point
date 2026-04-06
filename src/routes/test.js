@@ -4,6 +4,78 @@ import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import { prisma } from "../db/prisma.js";
 
+const UNITS = /\b(cm|cm²|cm³|m|km|g|kg|ml|l|litre|litres|liter|liters|mm|km\/h|m\/s|days?|hours?|hrs?|minutes?|mins?|seconds?|secs?|years?|yrs?|months?|weeks?|%|percent|dollars?|\$|euros?|pounds?|naira|°|degrees?)\b/gi;
+
+function stripUnits(s) {
+  return s.replace(UNITS, "").replace(/\s+/g, " ").trim();
+}
+
+function extractNumber(s) {
+  const n = parseFloat(s.replace(/[^0-9.\-]/g, ""));
+  return isNaN(n) ? null : n;
+}
+
+function parseRange(correct) {
+  const m = correct.match(/\(?\s*([\d.\-]+)\s+to\s+([\d.\-]+)\s*\)?/i);
+  if (m) return { lo: parseFloat(m[1]), hi: parseFloat(m[2]) };
+  return null;
+}
+
+// Safely evaluates simple math expressions — only allows: digits, operators, sqrt(), pi, spaces
+function safeEval(expr) {
+  try {
+    const sanitized = expr
+      .replace(/sqrt\(([0-9.]+)\)/gi, (_, n) => Math.sqrt(parseFloat(n)))
+      .replace(/pi/gi, Math.PI)
+      .replace(/[^0-9+\-*/^(). ]/g, "");
+    // only proceed if nothing suspicious remains
+    if (/[a-zA-Z]/.test(sanitized)) return null;
+    const result = Function(`"use strict"; return (${sanitized})`)();
+    return typeof result === "number" && isFinite(result) ? result : null;
+  } catch {
+    return null;
+  }
+}
+
+function matchFreeAnswer(submitted, correct) {
+  const s = submitted.trim().toLowerCase();
+  const c = correct.trim().toLowerCase();
+
+  if (s === c) return true;
+
+  const sStripped = stripUnits(s);
+  const cStripped = stripUnits(c);
+  if (sStripped === cStripped) return true;
+
+  const sNum = extractNumber(sStripped);
+  const cNum = extractNumber(cStripped);
+
+  if (sNum !== null && cNum !== null && sNum === cNum) return true;
+
+  // Evaluate math expressions (e.g. sqrt(180) → 13.416...)
+  const sEvaled = safeEval(sStripped) ?? safeEval(s);
+
+  if (sEvaled !== null) {
+    if (cNum !== null && Math.abs(sEvaled - cNum) < 0.01) return true;
+
+    const range = parseRange(c);
+    if (range && sEvaled >= range.lo && sEvaled <= range.hi) return true;
+
+    const primaryNum = extractNumber(stripUnits(c.split("(")[0]));
+    if (primaryNum !== null && Math.abs(sEvaled - primaryNum) < 0.01) return true;
+  }
+
+  if (sNum !== null) {
+    const range = parseRange(c);
+    if (range && sNum >= range.lo && sNum <= range.hi) return true;
+
+    const primaryNum = extractNumber(stripUnits(c.split("(")[0]));
+    if (primaryNum !== null && sNum === primaryNum) return true;
+  }
+
+  return false;
+}
+
 
 const router = express.Router();
 
@@ -151,11 +223,9 @@ router.post("/submit", async (req, res) => {
       if (!submitted) continue; // unanswered — no score
 
       if (q.correct) {
-        // MCQ — exact letter match
         if (submitted === q.correct.toLowerCase()) score++;
       } else if (q.answer) {
-        // Free answer — case-insensitive trimmed string match
-        if (submitted === String(q.answer).trim().toLowerCase()) score++;
+        if (matchFreeAnswer(submitted, String(q.answer))) score++;
       }
     }
 
