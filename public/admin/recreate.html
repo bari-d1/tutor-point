@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recreate Test — TutorPoint Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --yellow: #FFEB3C;
+      --black:  #2A2A2A;
+      --white:  #EEEEEE;
+      --gray:   #EDEDEC;
+      --pass:   #1f9d55;
+      --fail:   #c0392b;
+      --radius: 12px;
+    }
+
+    body {
+      font-family: "Bricolage Grotesque", sans-serif;
+      background: var(--white);
+      color: var(--black);
+      min-height: 100vh;
+    }
+
+    .hidden { display: none !important; }
+
+    /* ── HEADER ── */
+    header {
+      background: var(--black);
+      height: 60px;
+      display: flex;
+      align-items: center;
+      padding: 0 2rem;
+    }
+    header img { height: 28px; }
+
+    /* ── SHARED BUTTON ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 42px;
+      padding: 0 1.5rem;
+      border-radius: 999px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1.5px solid var(--black);
+      background: var(--black);
+      color: var(--yellow);
+      transition: background 0.15s;
+    }
+    .btn:hover { background: #111; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-outline { background: transparent; color: var(--black); }
+    .btn-outline:hover { background: var(--black); color: var(--yellow); }
+
+    /* ── SETUP SCREEN ── */
+    #setup-screen {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem;
+    }
+
+    h1 { font-size: 1.4rem; margin-bottom: 0.25rem; }
+    .sub { font-size: 0.85rem; color: #666; margin-bottom: 1.5rem; }
+
+    .field { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 1rem; }
+    .field label { font-size: 0.82rem; font-weight: 600; }
+    .field input {
+      height: 42px;
+      border: 1.5px solid var(--gray);
+      border-radius: 8px;
+      padding: 0 0.9rem;
+      font-family: inherit;
+      font-size: 0.95rem;
+      outline: none;
+    }
+    .field input:focus { border-color: var(--black); }
+
+    textarea.json-input {
+      width: 100%;
+      min-height: 220px;
+      border: 1.5px solid var(--gray);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-family: "Courier New", monospace;
+      font-size: 0.82rem;
+      resize: vertical;
+      outline: none;
+    }
+    textarea.json-input:focus { border-color: var(--black); }
+
+    .err { font-size: 0.83rem; color: var(--fail); margin-bottom: 0.75rem; }
+
+    /* ── TEST SCREEN ── */
+    #test-screen { display: none; }
+
+    .test-header {
+      background: var(--black);
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      height: 56px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .test-header-left { font-size: 0.85rem; opacity: 0.7; }
+    .test-header-right { display: flex; gap: 1rem; align-items: center; }
+
+    #progress-wrap { height: 4px; background: var(--gray); }
+    #progress-bar  { height: 100%; background: var(--yellow); transition: width 0.3s; width: 0%; }
+
+    #test-body {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 6rem;
+    }
+
+    .question-card {
+      background: #fff;
+      border: 1.5px solid var(--gray);
+      border-radius: var(--radius);
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .q-meta { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #888; margin-bottom: 0.6rem; }
+    .q-text { font-size: 1.05rem; line-height: 1.65; font-weight: 500; margin-bottom: 1.25rem; }
+
+    .options-list { display: flex; flex-direction: column; gap: 0.6rem; }
+    .option-label {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.7rem 1rem;
+      border: 1.5px solid var(--gray); border-radius: 10px;
+      cursor: pointer; transition: border-color 0.15s, background 0.15s;
+      font-size: 0.95rem;
+    }
+    .option-label:hover { border-color: var(--black); background: #f9f9f7; }
+    .option-label input[type="radio"] { display: none; }
+    .option-label.selected { border-color: var(--black); background: var(--yellow); font-weight: 600; }
+    .option-key {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 26px; height: 26px; border-radius: 50%;
+      border: 1.5px solid currentColor; font-size: 0.72rem; font-weight: 700; flex-shrink: 0;
+    }
+
+    .free-answer-wrap { display: flex; flex-direction: column; gap: 0.5rem; }
+    .format-tip {
+      background: #fffbea; border: 1.5px solid #ffe066; border-radius: 8px;
+      padding: 0.6rem 0.9rem; font-size: 0.78rem; line-height: 1.5; color: #7a6800;
+    }
+    .format-tip strong { display: block; margin-bottom: 0.2rem; }
+    textarea.free-input {
+      width: 100%; min-height: 100px;
+      border: 1.5px solid var(--gray); border-radius: 10px;
+      padding: 0.7rem 1rem; font-family: inherit; font-size: 0.95rem;
+      resize: vertical; outline: none;
+    }
+    textarea.free-input:focus { border-color: var(--black); }
+
+    .nav-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+
+    /* ── RESULT SCREEN ── */
+    #result-screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 60vh;
+      padding: 2rem;
+      gap: 1.25rem;
+    }
+
+    .result-card {
+      background: #fff; border: 1.5px solid var(--gray); border-radius: var(--radius);
+      padding: 2.5rem 2rem; max-width: 460px; width: 100%; text-align: center;
+    }
+    .result-label { font-size: 0.83rem; color: #888; margin-bottom: 0.2rem; }
+    .result-score { font-size: 3.5rem; font-weight: 800; line-height: 1; margin: 0.5rem 0; }
+    .result-verdict { font-size: 1.1rem; font-weight: 700; margin-top: 0.75rem; }
+    .result-verdict.pass { color: var(--pass); }
+    .result-verdict.fail { color: var(--fail); }
+
+    /* ── BREAKDOWN ── */
+    .breakdown { max-width: 700px; width: 100%; }
+    .breakdown h3 { font-size: 1rem; margin-bottom: 1rem; }
+    .bq-row {
+      background: #fff; border: 1.5px solid var(--gray); border-radius: 10px;
+      padding: 1rem; margin-bottom: 0.75rem;
+    }
+    .bq-top { display: flex; gap: 0.6rem; align-items: flex-start; margin-bottom: 0.5rem; }
+    .bq-num { font-size: 0.7rem; font-weight: 700; background: var(--gray); border-radius: 999px; padding: 2px 8px; white-space: nowrap; flex-shrink: 0; margin-top: 2px; }
+    .bq-text { font-size: 0.88rem; line-height: 1.5; font-weight: 500; }
+    .bq-answers { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.82rem; }
+    .answer-box { padding: 0.45rem 0.7rem; border-radius: 8px; border: 1.5px solid var(--gray); }
+    .answer-box label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; color: #888; display: block; margin-bottom: 2px; }
+    .correct-box   { border-color: var(--pass); background: #f0fff6; }
+    .incorrect-box { border-color: var(--fail); background: #fff5f5; }
+    .neutral-box   { border-color: var(--gray); }
+  </style>
+</head>
+<body>
+
+<header>
+  <img src="/assets/images/logo.svg" alt="TutorPoint" />
+</header>
+
+<!-- Setup -->
+<div id="setup-screen">
+  <h1>Recreate Test</h1>
+  <p class="sub">Paste your questions JSON and enter an application ID to start a test session.</p>
+
+  <div class="field">
+    <label for="admin-token">Admin Token</label>
+    <input id="admin-token" type="password" placeholder="••••••••" />
+  </div>
+
+  <div class="field">
+    <label for="app-id">Application ID</label>
+    <input id="app-id" type="text" placeholder="e.g. test-dev-entry-001" value="test-dev-entry-001" />
+  </div>
+
+  <div class="field">
+    <label for="session-name">Session name (optional)</label>
+    <input id="session-name" type="text" placeholder="e.g. Retake — April 2026" />
+  </div>
+
+  <div class="field">
+    <label for="json-input">Questions JSON</label>
+    <textarea id="json-input" class="json-input" placeholder="Paste your questions array here…"></textarea>
+  </div>
+
+  <p id="setup-error" class="err hidden"></p>
+  <button class="btn" id="start-btn">Load test →</button>
+</div>
+
+<!-- Test -->
+<div id="test-screen">
+  <div class="test-header">
+    <span class="test-header-left" id="q-counter">Q 1 / 40</span>
+    <span class="test-header-right">
+      <span id="exam-badge" style="background:var(--yellow);color:var(--black);font-size:0.72rem;font-weight:700;padding:3px 10px;border-radius:999px;text-transform:uppercase;letter-spacing:0.04em;">—</span>
+    </span>
+  </div>
+  <div id="progress-wrap"><div id="progress-bar"></div></div>
+
+  <div id="test-body">
+    <div class="question-card">
+      <div class="q-meta" id="q-meta"></div>
+      <div class="q-text" id="q-text"></div>
+      <div id="q-input"></div>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-outline" id="btn-prev">← Previous</button>
+      <button class="btn" style="background:var(--yellow);color:var(--black);border-color:var(--yellow);" id="btn-submit">Submit Test</button>
+      <button class="btn" id="btn-next">Next →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Result -->
+<div id="result-screen">
+  <div class="result-card">
+    <div class="result-label">Your score</div>
+    <div class="result-score" id="res-score">—</div>
+    <div class="result-label" id="res-fraction"></div>
+    <div class="result-verdict" id="res-verdict"></div>
+  </div>
+
+  <div class="breakdown" id="breakdown"></div>
+</div>
+
+<script>
+(() => {
+  let questions = [];
+  let answers   = {};
+  let current   = 0;
+  let sessionId = null;
+
+  const $setup      = document.getElementById("setup-screen");
+  const $test       = document.getElementById("test-screen");
+  const $result     = document.getElementById("result-screen");
+  const $token       = document.getElementById("admin-token");
+  const $appId       = document.getElementById("app-id");
+  const $sessionName = document.getElementById("session-name");
+  const $jsonInput  = document.getElementById("json-input");
+  const $setupErr   = document.getElementById("setup-error");
+  const $startBtn   = document.getElementById("start-btn");
+
+  const $counter    = document.getElementById("q-counter");
+  const $badge      = document.getElementById("exam-badge");
+  const $bar        = document.getElementById("progress-bar");
+  const $qMeta      = document.getElementById("q-meta");
+  const $qText      = document.getElementById("q-text");
+  const $qInput     = document.getElementById("q-input");
+  const $btnPrev    = document.getElementById("btn-prev");
+  const $btnNext    = document.getElementById("btn-next");
+  const $btnSubmit  = document.getElementById("btn-submit");
+
+  // ── Setup ──────────────────────────────────────────────
+  $startBtn.addEventListener("click", async () => {
+    $setupErr.classList.add("hidden");
+
+    const appId = $appId.value.trim();
+    if (!appId) { showSetupErr("Application ID is required."); return; }
+
+    let parsed;
+    try { parsed = JSON.parse($jsonInput.value); } catch { showSetupErr("Invalid JSON — check your questions array."); return; }
+    if (!Array.isArray(parsed) || !parsed.length) { showSetupErr("JSON must be a non-empty array."); return; }
+
+    $startBtn.disabled = true;
+    $startBtn.textContent = "Creating session…";
+
+    try {
+      const res  = await fetch(`/api/admin/recreate`, {
+        method:  "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${$token.value.trim()}` },
+        body:    JSON.stringify({ applicationId: appId, questions: parsed, sessionName: $sessionName.value.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) { showSetupErr(data.error ?? "Failed to create session."); return; }
+
+      questions = parsed;
+      answers   = {};
+      current   = 0;
+      sessionId = data.sessionId;
+
+      $setup.style.display = "none";
+      $test.style.display  = "block";
+      render();
+
+    } catch { showSetupErr("Network error."); }
+    finally { $startBtn.disabled = false; $startBtn.textContent = "Load test →"; }
+  });
+
+  function showSetupErr(msg) { $setupErr.textContent = msg; $setupErr.classList.remove("hidden"); }
+
+  // ── Render ─────────────────────────────────────────────
+  function examBoard(q) {
+    const s = (q.source ?? "").toUpperCase();
+    if (s.includes("IGCSE") || s.includes("CAMBRIDGE")) return "IGCSE";
+    if (s.includes("JAMB")) return "JAMB";
+    if (s.includes("NECO")) return "NECO";
+    if (s.includes("WAEC")) return "WAEC";
+    return q.source ?? "—";
+  }
+
+  function isMCQ(q) { return !!(q.optionA || q.optionB); }
+
+  function answeredCount() {
+    return questions.filter(q => { const a = answers[q.id]; return a !== undefined && String(a).trim() !== ""; }).length;
+  }
+
+  function render() {
+    const q   = questions[current];
+    const tot = questions.length;
+
+    $badge.textContent   = examBoard(q);
+    $counter.textContent = `Q ${current + 1} / ${tot}`;
+    $bar.style.width     = (answeredCount() / tot * 100) + "%";
+
+    $qMeta.textContent = `${q.source ?? ""} · ${q.topic ?? ""}`.replace(/^ · | · $/g, "");
+    $qText.textContent = q.question;
+
+    $btnPrev.disabled = current === 0;
+    $btnNext.disabled = current === tot - 1;
+
+    $qInput.innerHTML = "";
+
+    if (isMCQ(q)) {
+      const list = document.createElement("div");
+      list.className = "options-list";
+
+      ["A","B","C","D"].map(k => ({ key: k, text: q[`option${k}`] })).filter(o => o.text).forEach(({ key, text }) => {
+        const lbl = document.createElement("label");
+        lbl.className = "option-label" + (answers[q.id] === key ? " selected" : "");
+
+        const radio = document.createElement("input");
+        radio.type = "radio"; radio.name = "mcq"; radio.value = key; radio.checked = answers[q.id] === key;
+
+        const keySpan = document.createElement("span");
+        keySpan.className = "option-key"; keySpan.textContent = key;
+
+        const txt = document.createElement("span");
+        txt.textContent = text;
+
+        lbl.appendChild(radio); lbl.appendChild(keySpan); lbl.appendChild(txt);
+        lbl.addEventListener("click", () => { answers[q.id] = key; render(); });
+        list.appendChild(lbl);
+      });
+
+      $qInput.appendChild(list);
+
+    } else {
+      const wrap = document.createElement("div");
+      wrap.className = "free-answer-wrap";
+
+      const tip = document.createElement("div");
+      tip.className = "format-tip";
+      tip.innerHTML = `<strong>Formatting guidelines</strong>Use plain text. Fractions: <code>3/4</code>. Powers: <code>x^2</code>. Roots: <code>sqrt(9)</code>. Separate multiple values with commas.`;
+
+      const ta = document.createElement("textarea");
+      ta.className = "free-input"; ta.placeholder = "Type your answer here…"; ta.value = answers[q.id] ?? "";
+      ta.addEventListener("input", () => { answers[q.id] = ta.value; $bar.style.width = (answeredCount() / questions.length * 100) + "%"; });
+
+      wrap.appendChild(tip); wrap.appendChild(ta);
+      $qInput.appendChild(wrap);
+    }
+  }
+
+  $btnPrev.addEventListener("click",   () => { if (current > 0)                    { current--; render(); } });
+  $btnNext.addEventListener("click",   () => { if (current < questions.length - 1) { current++; render(); } });
+  $btnSubmit.addEventListener("click", async () => score());
+
+  // ── Score locally ──────────────────────────────────────
+  function matchFreeAnswer(submitted, correct) {
+    const UNITS = /\b(cm|cm²|cm³|m|km|g|kg|ml|l|litres?|liters?|mm|km\/h|m\/s|days?|hours?|hrs?|minutes?|mins?|seconds?|secs?|years?|yrs?|months?|weeks?|%|percent|dollars?|\$|euros?|pounds?|naira|°|degrees?)\b/gi;
+    const strip = s => s.replace(UNITS, "").replace(/\s+/g, " ").trim();
+    const num   = s => { const n = parseFloat(s.replace(/[^0-9.\-]/g, "")); return isNaN(n) ? null : n; };
+    const range = c => { const m = c.match(/\(?\s*([\d.\-]+)\s+to\s+([\d.\-]+)\s*\)?/i); return m ? { lo: parseFloat(m[1]), hi: parseFloat(m[2]) } : null; };
+    const safeEval = expr => {
+      try {
+        const s = expr.replace(/sqrt\(([0-9.]+)\)/gi, (_, n) => Math.sqrt(parseFloat(n))).replace(/pi/gi, Math.PI).replace(/[^0-9+\-*/^(). ]/g, "");
+        if (/[a-zA-Z]/.test(s)) return null;
+        const r = Function(`"use strict"; return (${s})`)();
+        return typeof r === "number" && isFinite(r) ? r : null;
+      } catch { return null; }
+    };
+
+    const s = submitted.trim().toLowerCase();
+    const c = correct.trim().toLowerCase();
+    if (s === c) return true;
+    const ss = strip(s), cs = strip(c);
+    if (ss === cs) return true;
+    const sn = num(ss), cn = num(cs);
+    if (sn !== null && cn !== null && sn === cn) return true;
+    const se = safeEval(ss) ?? safeEval(s);
+    if (se !== null) {
+      if (cn !== null && Math.abs(se - cn) < 0.01) return true;
+      const r = range(c); if (r && se >= r.lo && se <= r.hi) return true;
+      const pn = num(strip(c.split("(")[0])); if (pn !== null && Math.abs(se - pn) < 0.01) return true;
+    }
+    if (sn !== null) {
+      const r = range(c); if (r && sn >= r.lo && sn <= r.hi) return true;
+      const pn = num(strip(c.split("(")[0])); if (pn !== null && sn === pn) return true;
+    }
+    return false;
+  }
+
+  async function score() {
+    // Save to DB via submit endpoint
+    if (sessionId) {
+      await fetch("/api/tutors/test/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ session_id: sessionId, answers }),
+      }).catch(console.error);
+    }
+
+    const total = questions.length;
+    let sc = 0;
+
+    questions.forEach(q => {
+      const submitted = String(answers[q.id] ?? "").trim().toLowerCase();
+      if (!submitted) return;
+      if (q.correct) { if (submitted === q.correct.toLowerCase()) sc++; }
+      else if (q.answer) { if (matchFreeAnswer(submitted, String(q.answer))) sc++; }
+    });
+
+    const pct    = Math.round((sc / total) * 100);
+    const passed = pct >= 60;
+
+    $test.style.display   = "none";
+    $result.style.display = "flex";
+
+    document.getElementById("res-score").textContent    = pct + "%";
+    document.getElementById("res-fraction").textContent = `${sc} / ${total} correct`;
+    const verdict = document.getElementById("res-verdict");
+    verdict.textContent = passed ? "You passed!" : "Better luck next time.";
+    verdict.className   = "result-verdict " + (passed ? "pass" : "fail");
+
+    // Breakdown
+    const bd = document.getElementById("breakdown");
+    bd.innerHTML = "<h3>Question breakdown</h3>" + questions.map((q, i) => {
+      const isMcq     = !!(q.optionA || q.optionB);
+      const correct   = isMcq ? q.correct : q.answer;
+      const submitted = String(answers[q.id] ?? "").trim();
+      const isCorrect = submitted ? (isMcq ? submitted.toLowerCase() === (correct ?? "").toLowerCase() : matchFreeAnswer(submitted, String(correct ?? ""))) : false;
+      const verdict   = submitted ? (isCorrect ? "✅" : "❌") : "—";
+
+      return `<div class="bq-row">
+        <div class="bq-top"><span class="bq-num">Q${i+1} · ${q.source ?? ""}</span><span class="bq-text">${esc(q.question)}</span></div>
+        <div class="bq-answers">
+          <div class="answer-box ${submitted ? (isCorrect ? "correct-box" : "incorrect-box") : "neutral-box"}">
+            <label>Your answer</label><span>${esc(submitted || "No answer")} ${verdict}</span>
+          </div>
+          <div class="answer-box correct-box">
+            <label>Correct answer</label><span>${esc(correct ?? "—")}</span>
+          </div>
+        </div>
+      </div>`;
+    }).join("");
+  }
+
+  function esc(s) { return String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+})();
+</script>
+</body>
+</html>

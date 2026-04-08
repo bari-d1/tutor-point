@@ -210,9 +210,7 @@ router.post("/submit", async (req, res) => {
     }
 
     const elapsed = Date.now() - new Date(session.startedAt).getTime();
-    if (elapsed > 75 * 60 * 1000) {
-      return res.status(410).json({ ok: false, error: "Session expired — 75 minute limit exceeded" });
-    }
+    const expired = elapsed > 75 * 60 * 1000;
 
     const questions = session.questions;
     const total = questions.length;
@@ -237,7 +235,7 @@ router.post("/submit", async (req, res) => {
       data: { answers, score, total, submittedAt: new Date() },
     });
 
-    return res.json({ ok: true, score, total, percentage, passed });
+    return res.json({ ok: true, score, total, percentage, passed, expired });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ ok: false, error: "Server error" });

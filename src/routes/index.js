@@ -6,9 +6,9 @@ import adminRouter from "./admin.js";
 
 const router = Router();
 
+router.use("/tutors/test", testRouter);
 router.use("/tutors", tutorsRouter);
 router.use("/parents", parentRouter);
-router.use("/tutors/test", testRouter);
 router.use("/admin", adminRouter);
 
 export default router;

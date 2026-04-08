@@ -30,7 +30,7 @@ model TutorApplication {
   @@index([email])
 }
 model TestSession {
-  id                  String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id                  String    @id @default(dbgenerated("gen_random_uuid()::text"))
   tutorApplicationId  String    @map("tutor_application_id")
   tutorApplication    TutorApplication @relation(fields: [tutorApplicationId], references: [id], onDelete: Cascade)
   testName            String?   @map("test_name")

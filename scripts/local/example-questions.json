@@ -1,0 +1,24 @@
+[
+  {
+    "id": "CUSTOM_001",
+    "source": "WAEC",
+    "year": "2023",
+    "number": 1,
+    "question": "Simplify: 3x + 2y - x + 4y",
+    "optionA": "2x + 6y",
+    "optionB": "4x + 2y",
+    "optionC": "2x + 2y",
+    "optionD": "4x + 6y",
+    "correct": "A",
+    "topic": "Algebra"
+  },
+  {
+    "id": "CUSTOM_002",
+    "source": "Cambridge IGCSE Mathematics 0580/04",
+    "year": "2024",
+    "number": 2,
+    "question": "Find the value of x if 2x + 5 = 13.",
+    "answer": "4",
+    "topic": "Linear Equations"
+  }
+]

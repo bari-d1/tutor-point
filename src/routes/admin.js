@@ -1,4 +1,5 @@
 import express from "express";
+import { randomUUID } from "crypto";
 import { prisma } from "../db/prisma.js";
 
 const router = express.Router();
@@ -40,6 +41,30 @@ router.get("/results", requireToken, async (req, res) => {
     }));
 
     return res.json({ ok: true, results: rows });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ ok: false, error: "Server error" });
+  }
+});
+
+// POST /api/admin/recreate
+router.post("/recreate", requireToken, async (req, res) => {
+  try {
+    const { applicationId, questions, sessionName } = req.body;
+
+    if (!applicationId) return res.status(400).json({ ok: false, error: "applicationId is required" });
+    if (!Array.isArray(questions) || !questions.length) return res.status(400).json({ ok: false, error: "questions must be a non-empty array" });
+
+    const application = await prisma.tutorApplication.findUnique({ where: { id: applicationId } });
+    if (!application) return res.status(404).json({ ok: false, error: "Application not found" });
+
+    await prisma.testSession.deleteMany({ where: { tutorApplicationId: applicationId, submittedAt: null } });
+
+    const session = await prisma.testSession.create({
+      data: { id: `${randomUUID()}_RECREATE`, tutorApplicationId: applicationId, testName: sessionName || application.fullName, questions, total: questions.length },
+    });
+
+    return res.json({ ok: true, sessionId: session.id });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ ok: false, error: "Server error" });
