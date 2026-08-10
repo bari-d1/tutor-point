@@ -8,7 +8,8 @@
     "start": "node server.js",
     "build": "prisma generate",
     "postinstall": "prisma migrate deploy",
-    "prisma:studio": "prisma studio"
+    "prisma:studio": "prisma studio",
+    "email:preview": "node scripts/preview-emails.js"
   },
   "dependencies": {
     "@prisma/client": "^6.0.0",
@@ -16,7 +17,8 @@
     "express": "^4.19.2",
     "googleapis": "^140.0.0",
     "morgan": "^1.10.1",
-    "nodemon": "^3.1.14"
+    "nodemon": "^3.1.14",
+    "resend": "^6.18.1"
   },
   "devDependencies": {
     "dotenv": "^17.2.3",

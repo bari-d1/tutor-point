@@ -21,7 +21,7 @@
   <meta name="description" content="Connect with qualified tutors online. Whether you're a parent looking for support or a tutor ready to teach, TutorPoint makes it simple." />
 </head>
 <div id="toast" class="toast hidden">
-  Application submitted successfully. We’ll be in touch.
+  Registration received. We’ve sent a confirmation email — if it isn’t there in a few minutes, please check your spam or junk folder.
 </div>
 
 <script>
@@ -35,11 +35,11 @@
     // Remove query param from URL (clean URL)
     window.history.replaceState({}, document.title, "/");
 
-    // Auto-hide after 4 seconds
+    // Auto-hide after 9 seconds (long enough to read the spam-folder note)
     setTimeout(() => {
       toast.classList.remove("show");
       toast.classList.add("hidden");
-    }, 4000);
+    }, 9000);
   }
 </script>
 <body>
@@ -74,8 +74,8 @@
   </header>
   <section id="hero" class="reveal">
     <div class="hero-left">
-      <h1 class="hero-h1">Measure and improve your child's maths in 3 weeks.</h1>
-      <p class="hero-description">We start with a maths assessment, deliver targeted online lessons, then re-test to clearly measure your child’s progress. See your child's progress in 3 weeks not 3 terms</p>
+      <h1 class="hero-h1">Measure and improve your child's maths in 2 weeks. <span class="hero-h1-highlight">With our maths bootcamp!</span></h1>
+      <p class="hero-description">We start with a maths assessment, deliver targeted online lessons, then re-test to clearly measure your child’s progress. See your child's progress in 2 weeks not 3 terms</p>
       <div class="hero-cta">
         <button class="register register-cta button" data-route="/register">
           <span class="btn-text">Register</span>

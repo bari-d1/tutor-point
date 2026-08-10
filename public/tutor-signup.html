@@ -210,7 +210,7 @@ tutorForm?.addEventListener("submit", async (e) => {
     const data = await res.json();
 
     if (res.ok && data.ok) {
-      statusEl.textContent = "Application submitted successfully. We will be in touch.";
+      statusEl.textContent = "Application submitted successfully. We've sent a confirmation email — if it isn't there in a few minutes, please check your spam or junk folder.";
       statusEl.className = "form-status success";
       tutorForm.reset();
     } else {

@@ -1,6 +1,7 @@
 import express from "express";
 import { prisma } from "../db/prisma.js";
 import { appendParentRegistration } from "../services/googleSheets.js";
+import { sendParentWelcomeEmail } from "../services/email.service.js";
 
 const router = express.Router();
 
@@ -52,6 +53,12 @@ router.post("/register", async (req, res) => {
       await appendParentRegistration(parent);
     } catch (err) {
       console.error("Sheets sync failed (parent):", err);
+    }
+
+    try {
+      await sendParentWelcomeEmail(parent);
+    } catch (err) {
+      console.error("Welcome email failed (parent):", err);
     }
 
     return res.status(201).json({ ok: true, parentId: parent.id, redirectTo: "/"});

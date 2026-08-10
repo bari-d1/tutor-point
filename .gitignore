@@ -7,3 +7,6 @@ __pycache__
 /src/generated/prisma
 *.dump
 
+# Rendered email previews (npm run email:preview)
+.email-previews/
+

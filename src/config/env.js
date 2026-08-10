@@ -20,5 +20,11 @@ export const env = {
   parentTab: process.env.PARENT_SHEET_TAB_NAME || "Parents",
 
   googleServiceAccountEmail: required("GOOGLE_SERVICE_ACCOUNT_EMAIL"),
-  googlePrivateKey: required("GOOGLE_PRIVATE_KEY")
+  googlePrivateKey: required("GOOGLE_PRIVATE_KEY"),
+
+  // Email (Resend). Optional so the app still boots without it configured.
+  resendApiKey: process.env.RESEND_API_KEY || "",
+  emailFrom: process.env.EMAIL_FROM || "TutorPoint <hello@tutorpoint.ng>",
+  emailReplyTo: process.env.EMAIL_REPLY_TO || "tutorpointng@gmail.com",
+  siteUrl: process.env.SITE_URL || "https://www.tutorpoint.ng"
 };

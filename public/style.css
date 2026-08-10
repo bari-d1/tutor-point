@@ -27,6 +27,8 @@
   padding: 14px 18px;
   border-radius: 12px;
   font-size: 0.95rem;
+  line-height: 1.5;
+  max-width: 340px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
   z-index: 9999;
   opacity: 0;
@@ -41,6 +43,16 @@
 
 .toast.hidden {
   pointer-events: none;
+}
+
+/* On narrow screens let the toast span the width instead of squeezing into a column */
+@media (max-width: 480px) {
+  .toast {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    max-width: none;
+  }
 }
 
 
@@ -221,6 +233,17 @@ nav ul{
   margin-top: 5%;
 }
 
+.hero-h1-highlight{
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  margin-top: 0.25em;
+  padding: 0.1em 0.4em;
+  background-color: #000;
+  color: var(--color-yellow);
+  border-radius: var(--radius-md);
+}
+
 .hero-description{
   margin: 5% 0;
   max-width: 55ch;
@@ -279,7 +302,7 @@ nav ul{
 
 .tutor-left{
   background-color: var(--border-default);
-  background-image: url("/assets/images/learning.jpg");
+  background-image: url("/assets/images/learning-1.jpg");
   margin-top: 5%;
 }
 
