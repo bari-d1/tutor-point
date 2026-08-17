@@ -9,7 +9,9 @@
     "build": "prisma generate",
     "postinstall": "prisma migrate deploy",
     "prisma:studio": "prisma studio",
-    "email:preview": "node scripts/preview-emails.js"
+    "email:preview": "node scripts/preview-emails.js",
+    "student:links": "node scripts/student-test-links.js",
+    "student:test-accounts": "node scripts/local/create-student-test-accounts.js"
   },
   "dependencies": {
     "@prisma/client": "^6.0.0",

@@ -1,6 +1,9 @@
 node_modules
 __pycache__
 *.pyc
+
+# macOS Finder metadata
+.DS_Store
 # Keep environment variables out of version control
 .env
 
@@ -9,4 +12,7 @@ __pycache__
 
 # Rendered email previews (npm run email:preview)
 .email-previews/
+
+# Generated student test links — contains parent contact details
+student-test-links.csv
 

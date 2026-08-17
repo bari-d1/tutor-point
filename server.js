@@ -48,6 +48,10 @@ app.get("/admin/recreate", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "admin", "recreate.html"));
 });
 
+app.get("/admin/student-results", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "admin", "student-results.html"));
+});
+
 // Basic health
 app.get("/health", (req, res) => res.json({ ok: true }));
 

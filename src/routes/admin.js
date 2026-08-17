@@ -47,6 +47,122 @@ router.get("/results", requireToken, async (req, res) => {
   }
 });
 
+// GET /api/admin/student-results — every student sitting, newest first.
+// Includes the answer key, since this is behind the admin token.
+router.get("/student-results", requireToken, async (req, res) => {
+  try {
+    const sessions = await prisma.studentTestSession.findMany({
+      orderBy: [{ submittedAt: "desc" }, { startedAt: "desc" }],
+      include: {
+        parentRegistration: {
+          select: {
+            id: true,
+            childName: true,
+            childClass: true,
+            parentName: true,
+            parentEmail: true,
+            parentPhone: true
+          }
+        }
+      }
+    });
+
+    const rows = sessions.map((s) => {
+      const answers = s.answers ?? {};
+      const answered = s.questions.filter(
+        (q) => String(answers[q.id] ?? "").trim() !== ""
+      ).length;
+
+      return {
+        sessionId: s.id,
+        registrationId: s.parentRegistrationId,
+        isTestAccount: String(s.parentRegistrationId).startsWith("student-test-"),
+        studentName: s.studentName ?? s.parentRegistration?.childName ?? "—",
+        childName: s.parentRegistration?.childName ?? "—",
+        childClass: s.parentRegistration?.childClass ?? "—",
+        parentName: s.parentRegistration?.parentName ?? "—",
+        parentEmail: s.parentRegistration?.parentEmail ?? "—",
+        parentPhone: s.parentRegistration?.parentPhone ?? "—",
+        classLevel: s.classLevel,
+        markingStatus: s.markingStatus,
+        score: s.score,
+        total: s.total,
+        answered,
+        markedAt: s.markedAt,
+        markedBy: s.markedBy,
+        startedAt: s.startedAt,
+        submittedAt: s.submittedAt,
+        questions: s.questions,
+        answers
+      };
+    });
+
+    return res.json({ ok: true, results: rows });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ ok: false, error: "Server error" });
+  }
+});
+
+// POST /api/admin/student-mark — record a hand-marked score.
+router.post("/student-mark", requireToken, async (req, res) => {
+  try {
+    const { sessionId, score, markedBy, reopen } = req.body;
+
+    if (!sessionId) {
+      return res.status(400).json({ ok: false, error: "sessionId is required" });
+    }
+
+    const session = await prisma.studentTestSession.findUnique({ where: { id: sessionId } });
+    if (!session) {
+      return res.status(404).json({ ok: false, error: "Session not found" });
+    }
+
+    // Send it back to the queue without a score.
+    if (reopen) {
+      const updated = await prisma.studentTestSession.update({
+        where: { id: sessionId },
+        data: { markingStatus: "PENDING", score: null, markedAt: null, markedBy: null }
+      });
+      return res.json({ ok: true, markingStatus: updated.markingStatus, score: updated.score });
+    }
+
+    const parsed = Number(score);
+    if (!Number.isInteger(parsed) || parsed < 0 || parsed > session.total) {
+      return res.status(400).json({
+        ok: false,
+        error: `score must be a whole number between 0 and ${session.total}`
+      });
+    }
+
+    if (!session.submittedAt) {
+      return res.status(409).json({ ok: false, error: "This paper has not been submitted yet" });
+    }
+
+    const updated = await prisma.studentTestSession.update({
+      where: { id: sessionId },
+      data: {
+        score: parsed,
+        markingStatus: "MARKED",
+        markedAt: new Date(),
+        markedBy: markedBy ? String(markedBy).trim() : null
+      }
+    });
+
+    return res.json({
+      ok: true,
+      markingStatus: updated.markingStatus,
+      score: updated.score,
+      total: updated.total,
+      markedAt: updated.markedAt,
+      markedBy: updated.markedBy
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ ok: false, error: "Server error" });
+  }
+});
+
 // POST /api/admin/recreate
 router.post("/recreate", requireToken, async (req, res) => {
   try {

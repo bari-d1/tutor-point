@@ -61,6 +61,34 @@ model ParentRegistration {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  studentTestSessions StudentTestSession[]
+
   @@index([parentEmail])
+}
+
+model StudentTestSession {
+  id                   String   @id @default(dbgenerated("gen_random_uuid()::text"))
+  parentRegistrationId String   @map("parent_registration_id")
+  parentRegistration   ParentRegistration @relation(fields: [parentRegistrationId], references: [id], onDelete: Cascade)
+
+  studentName          String?  @map("student_name")
+  classLevel           String   @map("class_level")
+
+  questions            Json
+  answers              Json?
+
+  // Marked by hand — score stays null until a tutor reviews the paper.
+  markingStatus        String   @default("PENDING") @map("marking_status")
+  score                Int?
+  total                Int
+  markedAt             DateTime? @map("marked_at")
+  markedBy             String?   @map("marked_by")
+
+  startedAt            DateTime  @default(now()) @map("started_at")
+  submittedAt          DateTime? @map("submitted_at")
+
+  @@index([parentRegistrationId])
+  @@index([markingStatus])
+  @@map("student_test_sessions")
 }
 

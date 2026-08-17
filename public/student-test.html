@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Maths Assessment — TutorPoint</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="shortcut icon" href="/favicon.ico" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --yellow: #FFEB3C;
+      --black: #2A2A2A;
+      --white: #EEEEEE;
+      --gray: #EDEDEC;
+      --radius: 16px;
+      --header-h: 68px;
+    }
+
+    body {
+      font-family: "Bricolage Grotesque", sans-serif;
+      background: var(--white);
+      color: var(--black);
+      min-height: 100vh;
+    }
+
+    /* ── LOADING / ERROR / DONE STATES ── */
+    #loading, #error-screen, #done-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      gap: 1rem;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    #error-screen h2 { color: #c0392b; }
+    #error-screen p  { color: #555; max-width: 440px; }
+
+    .spinner {
+      width: 44px; height: 44px;
+      border: 4px solid var(--gray);
+      border-top-color: var(--black);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── STICKY HEADER ── */
+    #test-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--black);
+      color: var(--white);
+      height: var(--header-h);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      gap: 1rem;
+    }
+
+    .header-meta {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .exam-badge {
+      background: var(--yellow);
+      color: var(--black);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 999px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .q-counter {
+      font-size: 0.85rem;
+      opacity: 0.75;
+      white-space: nowrap;
+    }
+
+    #timer {
+      font-size: 1rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
+
+    #timer.urgent { color: #ff6b6b; }
+
+    /* ── PROGRESS BAR ── */
+    #progress-wrap {
+      height: 4px;
+      background: var(--gray);
+      position: sticky;
+      top: var(--header-h);
+      z-index: 99;
+    }
+
+    #progress-bar {
+      height: 100%;
+      background: var(--yellow);
+      transition: width 0.3s ease;
+      width: 0%;
+    }
+
+    /* ── MAIN CONTENT ── */
+    #test-body {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 6rem;
+    }
+
+    /* ── QUESTION CARD ── */
+    .question-card {
+      background: #fff;
+      border: 1.5px solid var(--gray);
+      border-radius: var(--radius);
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .q-meta {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #888;
+      margin-bottom: 0.75rem;
+    }
+
+    .q-marks {
+      background: var(--gray);
+      color: #555;
+      border-radius: 999px;
+      padding: 3px 10px;
+      white-space: nowrap;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+
+    .q-text {
+      font-size: 1.1rem;
+      line-height: 1.65;
+      font-weight: 500;
+      margin-bottom: 1.5rem;
+    }
+
+    /* ── MCQ OPTIONS (kept in case MCQs are added to the student banks) ── */
+    .options-list { display: flex; flex-direction: column; gap: 0.6rem; }
+
+    .option-label {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      border: 1.5px solid var(--gray);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      font-size: 0.95rem;
+    }
+
+    .option-label:hover { border-color: var(--black); background: #f9f9f7; }
+    .option-label input[type="radio"] { display: none; }
+
+    .option-label.selected {
+      border-color: var(--black);
+      background: var(--yellow);
+      font-weight: 600;
+    }
+
+    .option-key {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      border: 1.5px solid currentColor;
+      font-size: 0.75rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    /* ── FREE ANSWER ── */
+    .free-answer-wrap { display: flex; flex-direction: column; gap: 0.5rem; }
+
+    textarea.free-input {
+      width: 100%;
+      min-height: 96px;
+      border: 1.5px solid var(--gray);
+      border-radius: 10px;
+      padding: 0.75rem 1rem;
+      font-family: inherit;
+      font-size: 0.95rem;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    textarea.free-input:focus { border-color: var(--black); }
+
+    .saved-note {
+      font-size: 0.75rem;
+      color: #999;
+      min-height: 1rem;
+    }
+
+    /* ── NAV BUTTONS ── */
+    .nav-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 44px;
+      padding: 0 1.5rem;
+      border-radius: 999px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1.5px solid var(--black);
+      background: transparent;
+      color: var(--black);
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .btn:hover { background: var(--black); color: var(--white); }
+    .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .btn-primary { background: var(--black); color: var(--yellow); border-color: var(--black); }
+    .btn-primary:hover { background: #111; }
+
+    .btn-submit { background: var(--yellow); color: var(--black); border-color: var(--yellow); }
+    .btn-submit:hover { background: #f0da00; }
+
+    /* ── QUESTION NAVIGATOR ── */
+    .navigator {
+      background: #fff;
+      border: 1.5px solid var(--gray);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+    }
+
+    .navigator h4 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #888;
+      margin-bottom: 0.75rem;
+      font-weight: 600;
+    }
+
+    .nav-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(38px, 1fr));
+      gap: 0.4rem;
+    }
+
+    .nav-dot {
+      height: 38px;
+      border: 1.5px solid var(--gray);
+      border-radius: 8px;
+      background: #fff;
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #999;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .nav-dot:hover { border-color: var(--black); }
+    .nav-dot.answered { background: var(--yellow); border-color: var(--yellow); color: var(--black); }
+    .nav-dot.current  { border-color: var(--black); border-width: 2.5px; color: var(--black); }
+
+    /* ── DONE SCREEN ── */
+    .done-card {
+      background: #fff;
+      border: 1.5px solid var(--gray);
+      border-radius: var(--radius);
+      padding: 2.5rem 2rem;
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .done-tick {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      background: var(--yellow);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .done-card h2 { font-size: 1.5rem; margin-bottom: 0.75rem; }
+    .done-card p  { font-size: 0.95rem; color: #555; line-height: 1.6; margin-bottom: 0.75rem; }
+    .done-meta    { font-size: 0.85rem; color: #888; margin-top: 1.25rem; }
+
+    .done-pill {
+      display: inline-block;
+      background: var(--gray);
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #555;
+      margin-top: 0.5rem;
+    }
+
+    /* ── DIALOG ── */
+    #confirm-dialog {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    #confirm-dialog.open { display: flex; }
+
+    .dialog-box {
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 2rem;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .dialog-box h3 { margin-bottom: 0.5rem; }
+    .dialog-box p  { font-size: 0.9rem; color: #555; margin-bottom: 1.5rem; }
+
+    .dialog-actions { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
+
+    /* ── GATE SCREEN ── */
+    #gate-screen {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 2rem;
+      background: var(--white);
+    }
+
+    #gate-screen.open { display: flex; }
+
+    .gate-card {
+      background: #fff;
+      border: 1.5px solid var(--gray);
+      border-radius: var(--radius);
+      padding: 2.5rem 2rem;
+      max-width: 440px;
+      width: 100%;
+    }
+
+    .gate-logo {
+      background: var(--black);
+      display: inline-flex;
+      align-items: center;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      margin-bottom: 1.25rem;
+    }
+
+    .gate-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.4rem; }
+
+    .gate-sub {
+      font-size: 0.88rem;
+      color: #666;
+      margin-bottom: 1.5rem;
+      line-height: 1.55;
+    }
+
+    .gate-facts {
+      background: #fffbea;
+      border: 1.5px solid #ffe066;
+      border-radius: 10px;
+      padding: 0.85rem 1rem;
+      font-size: 0.82rem;
+      line-height: 1.7;
+      color: #7a6800;
+      margin-bottom: 1.5rem;
+    }
+
+    .gate-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      margin-bottom: 1rem;
+    }
+
+    .gate-field label { font-size: 0.82rem; font-weight: 600; color: var(--black); }
+
+    .gate-field input {
+      height: 44px;
+      border: 1.5px solid var(--gray);
+      border-radius: 10px;
+      padding: 0 1rem;
+      font-family: inherit;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .gate-field input:focus { border-color: var(--black); }
+
+    .gate-error { font-size: 0.85rem; color: #c0392b; margin-bottom: 0.75rem; }
+
+    .gate-btn { width: 100%; margin-top: 0.5rem; border-radius: 10px; height: 48px; font-size: 1rem; }
+
+    @media (max-width: 560px) {
+      #test-header { padding: 0 1rem; gap: 0.5rem; }
+      .header-meta { gap: 0.75rem; }
+      .q-counter { display: none; }
+      .question-card { padding: 1.25rem; }
+      #test-body { padding: 1.5rem 1rem 5rem; }
+      .nav-row { flex-wrap: wrap; }
+      .nav-row .btn { flex: 1 1 auto; }
+    }
+
+    /* ── HIDDEN ── */
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<!-- Loading -->
+<div id="loading">
+  <div class="spinner"></div>
+  <p>Loading your assessment…</p>
+</div>
+
+<!-- Gate screen -->
+<div id="gate-screen">
+  <div class="gate-card">
+    <div class="gate-logo"><img src="/assets/images/logo.svg" alt="TutorPoint" style="height:32px;display:block;" /></div>
+    <h2 class="gate-title">Maths Assessment</h2>
+    <p class="gate-sub" id="gate-sub">Enter your name and the password you were given to begin.</p>
+
+    <div class="gate-facts" id="gate-facts"></div>
+
+    <form id="gate-form">
+      <div class="gate-field">
+        <label for="gate-name">Your full name</label>
+        <input id="gate-name" type="text" placeholder="e.g. Amaka Obi" autocomplete="name" required />
+      </div>
+      <div class="gate-field">
+        <label for="gate-password">Password</label>
+        <input id="gate-password" type="text" autocomplete="off" required />
+      </div>
+      <p id="gate-error" class="gate-error hidden"></p>
+      <button class="btn btn-primary gate-btn" type="submit">Start assessment →</button>
+    </form>
+  </div>
+</div>
+
+<!-- Error -->
+<div id="error-screen" class="hidden">
+  <h2>Something went wrong</h2>
+  <p id="error-msg">Unable to load the assessment. Please check your link and try again.</p>
+</div>
+
+<!-- Test UI -->
+<div id="test-ui" class="hidden">
+
+  <header id="test-header">
+    <div class="header-logo"><img src="/assets/images/logo.svg" alt="TutorPoint" style="height:28px;display:block;" /></div>
+    <div class="header-meta">
+      <span id="level-badge" class="exam-badge">—</span>
+      <span id="q-counter" class="q-counter">Q 1 / —</span>
+      <span id="timer">—:—</span>
+    </div>
+  </header>
+
+  <div id="progress-wrap">
+    <div id="progress-bar"></div>
+  </div>
+
+  <main id="test-body">
+    <div class="question-card" id="question-card">
+      <div class="q-meta">
+        <span id="q-meta-text"></span>
+        <span class="q-marks" id="q-marks"></span>
+      </div>
+      <div class="q-text" id="q-text"></div>
+      <div id="q-input"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn" id="btn-prev">← Previous</button>
+      <button class="btn btn-submit" id="btn-submit">Submit work</button>
+      <button class="btn btn-primary" id="btn-next">Next →</button>
+    </div>
+
+    <div class="navigator" style="margin-top:1.5rem;">
+      <h4>All questions</h4>
+      <div class="nav-grid" id="nav-grid"></div>
+    </div>
+  </main>
+</div>
+
+<!-- Done screen -->
+<div id="done-screen" class="hidden">
+  <div class="done-card">
+    <div class="done-tick">✓</div>
+    <h2 id="done-title">Your work has been submitted</h2>
+    <p id="done-body">
+      A member of the TutorPoint team will mark your paper by hand and get back to you
+      with your results and feedback.
+    </p>
+    <p style="color:#888; font-size:0.85rem;">There's nothing else to do — you can close this window.</p>
+    <div class="done-pill" id="done-pill"></div>
+    <div class="done-meta" id="done-meta"></div>
+  </div>
+</div>
+
+<!-- Confirm dialog -->
+<div id="confirm-dialog" role="dialog" aria-modal="true">
+  <div class="dialog-box">
+    <h3>Submit your work?</h3>
+    <p id="dialog-msg">Once submitted you cannot change your answers.</p>
+    <div class="dialog-actions">
+      <button class="btn" id="dialog-cancel">Go back</button>
+      <button class="btn btn-submit" id="dialog-submit-anyway">Submit anyway</button>
+      <button class="btn btn-primary" id="dialog-confirm">Yes, submit</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  // ── State ──────────────────────────────────────────────
+  const params = new URLSearchParams(location.search);
+  const regId  = params.get("registration_id");
+
+  let sessionId = null;
+  let questions = [];
+  let answers   = {};   // { [questionId]: string }
+  let current   = 0;
+  let timerSecs = 0;
+  let timerInterval = null;
+  let submitted = false;
+
+  // ── DOM refs ───────────────────────────────────────────
+  const $loading  = document.getElementById("loading");
+  const $gate     = document.getElementById("gate-screen");
+  const $error    = document.getElementById("error-screen");
+  const $errorMsg = document.getElementById("error-msg");
+  const $testUi   = document.getElementById("test-ui");
+  const $done     = document.getElementById("done-screen");
+
+  const $badge   = document.getElementById("level-badge");
+  const $counter = document.getElementById("q-counter");
+  const $timer   = document.getElementById("timer");
+  const $bar     = document.getElementById("progress-bar");
+
+  const $qMeta  = document.getElementById("q-meta-text");
+  const $qMarks = document.getElementById("q-marks");
+  const $qText  = document.getElementById("q-text");
+  const $qInput = document.getElementById("q-input");
+  const $navGrid = document.getElementById("nav-grid");
+
+  const $btnPrev   = document.getElementById("btn-prev");
+  const $btnNext   = document.getElementById("btn-next");
+  const $btnSubmit = document.getElementById("btn-submit");
+
+  const $dialog    = document.getElementById("confirm-dialog");
+  const $dialogMsg = document.getElementById("dialog-msg");
+  const $dlgCancel = document.getElementById("dialog-cancel");
+  const $dlgOk     = document.getElementById("dialog-confirm");
+  const $dlgAnyway = document.getElementById("dialog-submit-anyway");
+
+  const $gateForm  = document.getElementById("gate-form");
+  const $gateName  = document.getElementById("gate-name");
+  const $gatePass  = document.getElementById("gate-password");
+  const $gateError = document.getElementById("gate-error");
+  const $gateSub   = document.getElementById("gate-sub");
+  const $gateFacts = document.getElementById("gate-facts");
+  const $gateBtn   = $gateForm.querySelector("button[type=submit]");
+
+  // ── Helpers ────────────────────────────────────────────
+  function show(el) { el.classList.remove("hidden"); }
+  function hide(el) { el.classList.add("hidden"); }
+  function showGate() { $gate.classList.add("open"); }
+  function hideGate() { $gate.classList.remove("open"); }
+
+  function fmtTime(s) {
+    const safe = Math.max(0, s);
+    const m = Math.floor(safe / 60).toString().padStart(2, "0");
+    const sec = (safe % 60).toString().padStart(2, "0");
+    return `${m}:${sec}`;
+  }
+
+  function isMCQ(q) { return !!(q.optionA || q.optionB); }
+
+  function answeredCount() {
+    return questions.filter((q) => String(answers[q.id] ?? "").trim() !== "").length;
+  }
+
+  function showError(msg) {
+    hide($loading);
+    hideGate();
+    $errorMsg.textContent = msg;
+    show($error);
+  }
+
+  function gateFail(msg) {
+    hide($loading);
+    showGate();
+    $gateError.textContent = msg;
+    $gateError.classList.remove("hidden");
+  }
+
+  // ── Local draft, so a refresh doesn't lose typed work ──
+  function draftKey() { return `tp_student_answers_${sessionId}`; }
+
+  function saveDraft() {
+    try { localStorage.setItem(draftKey(), JSON.stringify(answers)); } catch {}
+  }
+
+  function loadDraft() {
+    try {
+      const raw = localStorage.getItem(draftKey());
+      if (raw) answers = { ...JSON.parse(raw), ...answers };
+    } catch {}
+  }
+
+  function clearDraft() {
+    try { localStorage.removeItem(draftKey()); } catch {}
+  }
+
+  // ── Render ─────────────────────────────────────────────
+  function renderNavigator() {
+    $navGrid.innerHTML = "";
+    questions.forEach((q, i) => {
+      const dot = document.createElement("button");
+      dot.type = "button";
+      dot.className = "nav-dot"
+        + (String(answers[q.id] ?? "").trim() ? " answered" : "")
+        + (i === current ? " current" : "");
+      dot.textContent = i + 1;
+      dot.title = `${q.section ?? ""} — ${q.topic ?? ""}`;
+      dot.addEventListener("click", () => { current = i; render(); });
+      $navGrid.appendChild(dot);
+    });
+  }
+
+  function updateProgress() {
+    const tot = questions.length || 1;
+    $bar.style.width = (answeredCount() / tot) * 100 + "%";
+  }
+
+  function render() {
+    const q = questions[current];
+    const tot = questions.length;
+
+    $counter.textContent = `Q ${current + 1} / ${tot}`;
+    updateProgress();
+
+    $qMeta.textContent = [q.section, q.topic].filter(Boolean).join(" · ");
+    $qMarks.textContent = q.marks ? `${q.marks} mark${q.marks > 1 ? "s" : ""}` : "";
+    $qText.textContent = q.question;
+
+    $btnPrev.disabled = current === 0;
+    $btnNext.disabled = current === tot - 1;
+
+    $qInput.innerHTML = "";
+
+    if (isMCQ(q)) {
+      const list = document.createElement("div");
+      list.className = "options-list";
+
+      ["A", "B", "C", "D"]
+        .map((k) => ({ key: k, text: q[`option${k}`] }))
+        .filter((o) => o.text)
+        .forEach(({ key, text }) => {
+          const lbl = document.createElement("label");
+          lbl.className = "option-label" + (answers[q.id] === key ? " selected" : "");
+
+          const radio = document.createElement("input");
+          radio.type = "radio";
+          radio.name = "mcq";
+          radio.value = key;
+          radio.checked = answers[q.id] === key;
+
+          const keySpan = document.createElement("span");
+          keySpan.className = "option-key";
+          keySpan.textContent = key;
+
+          const txt = document.createElement("span");
+          txt.textContent = text;
+
+          lbl.append(radio, keySpan, txt);
+          lbl.addEventListener("click", () => {
+            answers[q.id] = key;
+            saveDraft();
+            render();
+          });
+
+          list.appendChild(lbl);
+        });
+
+      $qInput.appendChild(list);
+    } else {
+      const wrap = document.createElement("div");
+      wrap.className = "free-answer-wrap";
+
+      const ta = document.createElement("textarea");
+      ta.className = "free-input";
+      ta.placeholder = "Your answer…";
+      ta.value = answers[q.id] ?? "";
+
+      const note = document.createElement("div");
+      note.className = "saved-note";
+
+      let noteTimer = null;
+      ta.addEventListener("input", () => {
+        answers[q.id] = ta.value;
+        saveDraft();
+        updateProgress();
+        renderNavigator();
+        note.textContent = "Saved on this device";
+        clearTimeout(noteTimer);
+        noteTimer = setTimeout(() => { note.textContent = ""; }, 1500);
+      });
+
+      wrap.append(ta, note);
+      $qInput.appendChild(wrap);
+      ta.focus();
+    }
+
+    renderNavigator();
+  }
+
+  // ── Timer ──────────────────────────────────────────────
+  function startTimer(startedAt, durationMinutes) {
+    // Compute what's left from the server's start time, so resuming after a
+    // refresh doesn't hand back a fresh full allowance.
+    const elapsed = Math.floor((Date.now() - new Date(startedAt).getTime()) / 1000);
+    timerSecs = Math.max(0, durationMinutes * 60 - elapsed);
+
+    $timer.textContent = fmtTime(timerSecs);
+
+    if (timerSecs <= 0) { doSubmit(true); return; }
+
+    timerInterval = setInterval(() => {
+      timerSecs--;
+      $timer.textContent = fmtTime(timerSecs);
+      $timer.classList.toggle("urgent", timerSecs <= 5 * 60);
+      if (timerSecs <= 0) {
+        clearInterval(timerInterval);
+        doSubmit(true);
+      }
+    }, 1000);
+  }
+
+  // ── Boot: what is this link for? ───────────────────────
+  async function boot() {
+    if (!regId) {
+      window.location.href = "/404.html";
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/students/test/${encodeURIComponent(regId)}`);
+      const data = await res.json();
+
+      if (!res.ok || !data.ok) {
+        if (data.redirect404) { window.location.href = "/404.html"; return; }
+        showError(data.error ?? "Unable to load this assessment.");
+        return;
+      }
+
+      if (data.alreadySubmitted) {
+        hide($loading);
+        document.getElementById("done-title").textContent = "You've already submitted this assessment";
+        document.getElementById("done-body").textContent =
+          "Your paper is with the TutorPoint team for marking. They'll get back to you with your results and feedback.";
+        document.getElementById("done-pill").textContent = "Awaiting marking";
+        show($done);
+        return;
+      }
+
+      if (!data.supported) {
+        showError(`There is no maths assessment available for ${data.childClass || "this class"} yet. `
+          + "The TutorPoint team will be in touch when one is ready.");
+        return;
+      }
+
+      // Pre-fill the child's name from the registration; they can correct it.
+      if (data.childName) $gateName.value = data.childName;
+
+      $gateSub.textContent = `Hi ${(data.childName || "there").split(" ")[0]} — enter your name and the password you were given to begin.`;
+      $gateFacts.innerHTML =
+        `<strong>${data.classLevel}</strong> maths assessment &middot; ${data.durationMinutes} minutes<br />`
+        + "Answer every question. A tutor will mark your paper and get back to you.";
+
+      hide($loading);
+      showGate();
+    } catch {
+      showError("Network error. Please check your connection and reload this page.");
+    }
+  }
+
+  // ── Start ──────────────────────────────────────────────
+  $gateForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    $gateError.classList.add("hidden");
+    $gateBtn.disabled = true;
+    $gateBtn.textContent = "Starting…";
+
+    try {
+      hideGate();
+      show($loading);
+
+      const res = await fetch(`/api/students/test/start/${encodeURIComponent(regId)}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: $gateName.value.trim(), password: $gatePass.value.trim() }),
+      });
+      const data = await res.json();
+
+      if (!res.ok || !data.ok) {
+        if (data.redirect404) { window.location.href = "/404.html"; return; }
+        gateFail(data.error ?? "Failed to start the assessment.");
+        return;
+      }
+
+      sessionId = data.sessionId;
+      questions = data.questions;
+      loadDraft();
+
+      $badge.textContent = `${data.classLevel} Maths`;
+
+      hide($loading);
+      show($testUi);
+      current = 0;
+      render();
+      startTimer(data.startedAt, data.durationMinutes);
+    } catch {
+      gateFail("Network error. Please check your connection and try again.");
+    } finally {
+      $gateBtn.disabled = false;
+      $gateBtn.textContent = "Start assessment →";
+    }
+  });
+
+  // ── Submit ─────────────────────────────────────────────
+  async function doSubmit(auto = false) {
+    if (submitted) return;
+    submitted = true;
+    clearInterval(timerInterval);
+
+    try {
+      const res = await fetch("/api/students/test/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ session_id: sessionId, answers }),
+      });
+      const data = await res.json();
+
+      hide($testUi);
+      show($done);
+
+      if (!res.ok || !data.ok) {
+        document.getElementById("done-title").textContent = "We couldn't submit your work";
+        document.getElementById("done-body").textContent =
+          (data.error ?? "Submission failed.") + " Your answers are still saved on this device — "
+          + "please reload this page and try again, or contact the TutorPoint team.";
+        document.getElementById("done-pill").textContent = "Not submitted";
+        submitted = false; // allow a retry
+        return;
+      }
+
+      clearDraft();
+
+      // Set these explicitly: an earlier failed attempt may have rewritten them.
+      document.getElementById("done-title").textContent = "Your work has been submitted";
+      document.getElementById("done-body").textContent =
+        "A member of the TutorPoint team will mark your paper by hand and get back to you "
+        + "with your results and feedback.";
+      document.getElementById("done-pill").textContent = "Awaiting marking";
+      document.getElementById("done-meta").textContent =
+        `${data.answered} of ${data.total} questions answered`
+        + (auto || data.expired ? " · time ran out, your work was submitted automatically" : "");
+    } catch {
+      hide($testUi);
+      show($done);
+      document.getElementById("done-title").textContent = "We couldn't submit your work";
+      document.getElementById("done-body").textContent =
+        "Network error. Your answers are still saved on this device — please reload this page and try again.";
+      document.getElementById("done-pill").textContent = "Not submitted";
+      submitted = false;
+    }
+  }
+
+  // ── Navigation ─────────────────────────────────────────
+  $btnPrev.addEventListener("click", () => { if (current > 0) { current--; render(); } });
+  $btnNext.addEventListener("click", () => { if (current < questions.length - 1) { current++; render(); } });
+
+  $btnSubmit.addEventListener("click", () => {
+    const unanswered = questions.length - answeredCount();
+    if (unanswered > 0) {
+      $dialogMsg.textContent = `You have ${unanswered} unanswered question${unanswered > 1 ? "s" : ""}. `
+        + "Go back to answer them, or submit anyway.";
+      $dlgOk.classList.add("hidden");
+      $dlgAnyway.classList.remove("hidden");
+    } else {
+      $dialogMsg.textContent = "Once submitted you cannot change your answers.";
+      $dlgOk.classList.remove("hidden");
+      $dlgAnyway.classList.add("hidden");
+    }
+    $dialog.classList.add("open");
+  });
+
+  $dlgCancel.addEventListener("click", () => {
+    $dialog.classList.remove("open");
+    const firstUnanswered = questions.findIndex((q) => String(answers[q.id] ?? "").trim() === "");
+    if (firstUnanswered !== -1) {
+      current = firstUnanswered;
+      render();
+    }
+  });
+
+  $dlgAnyway.addEventListener("click", () => { $dialog.classList.remove("open"); doSubmit(); });
+  $dlgOk.addEventListener("click", () => { $dialog.classList.remove("open"); doSubmit(); });
+  $dialog.addEventListener("click", (e) => { if (e.target === $dialog) $dialog.classList.remove("open"); });
+
+  // Warn before losing an in-progress paper.
+  window.addEventListener("beforeunload", (e) => {
+    if (sessionId && !submitted) { e.preventDefault(); e.returnValue = ""; }
+  });
+
+  boot();
+})();
+</script>
+</body>
+</html>
