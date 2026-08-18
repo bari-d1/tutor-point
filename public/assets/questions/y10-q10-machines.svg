@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 170" width="520" height="170">
+  <title>Two function machines: A multiplies by 2; B multiplies by 2 then adds 3</title>
+  <style>
+    .lbl{font:500 14px Helvetica,Arial,sans-serif;fill:#2A2A2A}
+    .name{font:700 14px Helvetica,Arial,sans-serif;fill:#2A2A2A}
+    .wire{stroke:#2A2A2A;stroke-width:1.4}
+    .box{stroke:#2A2A2A;stroke-width:1.5;fill:none}
+    .op{font:500 15px Helvetica,Arial,sans-serif;fill:#2A2A2A;text-anchor:middle}
+  </style>
+
+  <text class="name" x="8" y="48">Function A:</text>
+  <text class="lbl" x="108" y="48">Input</text>
+  <line class="wire" x1="152" y1="43" x2="205" y2="43"/>
+  <path class="box" d="M205,25 L248,25 L262,43 L248,61 L205,61 Z"/>
+  <text class="op" x="228" y="48">×2</text>
+  <line class="wire" x1="262" y1="43" x2="330" y2="43"/>
+  <text class="lbl" x="338" y="48">Output</text>
+
+  <text class="name" x="8" y="122">Function B:</text>
+  <text class="lbl" x="108" y="122">Input</text>
+  <line class="wire" x1="152" y1="117" x2="205" y2="117"/>
+  <path class="box" d="M205,99 L248,99 L262,117 L248,135 L205,135 Z"/>
+  <text class="op" x="228" y="122">×2</text>
+  <line class="wire" x1="262" y1="117" x2="320" y2="117"/>
+  <path class="box" d="M320,99 L363,99 L377,117 L363,135 L320,135 Z"/>
+  <text class="op" x="343" y="122">+3</text>
+  <line class="wire" x1="377" y1="117" x2="430" y2="117"/>
+  <text class="lbl" x="438" y="122">Output</text>
+</svg>

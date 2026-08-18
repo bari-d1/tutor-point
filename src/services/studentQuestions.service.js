@@ -11,11 +11,17 @@ const questionsDir = join(__dirname, "../../student-questions");
  * sitting representative of the syllabus instead of clustering on one topic.
  */
 export const CLASS_LEVELS = {
-  SS2: { file: "ss2-mathematics.json", perSection: 4 },
-  SS3: { file: "ss3-mathematics.json", perSection: 5 }
+  SS2: { file: "ss2-mathematics.json", perSection: 4, durationMinutes: 75 },
+  SS3: { file: "ss3-mathematics.json", perSection: 5, durationMinutes: 75 },
+  // A real past paper — served whole and in order rather than sampled.
+  Y10: { file: "y10-mathematics.json", wholePaper: true, durationMinutes: 60 }
 };
 
 export const TEST_DURATION_MINUTES = 75;
+
+export function getDurationMinutes(classLevel) {
+  return CLASS_LEVELS[classLevel]?.durationMinutes ?? TEST_DURATION_MINUTES;
+}
 
 /**
  * The signup form stores "SSS 2" / "SSS 3"; the question bank uses "SS2" / "SS3".
@@ -25,8 +31,9 @@ export const TEST_DURATION_MINUTES = 75;
 export function normalizeClassLevel(raw) {
   const s = String(raw ?? "").trim().toUpperCase().replace(/[\s_-]+/g, "");
 
-  if (["SS2", "SSS2", "SENIORSECONDARY2", "YEAR11"].includes(s)) return "SS2";
-  if (["SS3", "SSS3", "SENIORSECONDARY3", "YEAR12"].includes(s)) return "SS3";
+  if (["SS2", "SSS2", "SENIORSECONDARY2"].includes(s)) return "SS2";
+  if (["SS3", "SSS3", "SENIORSECONDARY3"].includes(s)) return "SS3";
+  if (["Y10", "YEAR10", "4THYEAR", "FOURTHYEAR", "GCSE"].includes(s)) return "Y10";
 
   return null;
 }
@@ -65,8 +72,13 @@ export function buildStudentPaper(rawClassLevel) {
     throw new Error(`No question bank for class: ${rawClassLevel}`);
   }
 
-  const { perSection } = CLASS_LEVELS[classLevel];
+  const { perSection, wholePaper } = CLASS_LEVELS[classLevel];
   const bank = loadBank(classLevel);
+
+  // A past paper is sat as printed: every question, in order.
+  if (wholePaper) {
+    return bank.map((q, i) => ({ ...q, sourceNumber: q.sourceNumber ?? q.number, number: i + 1 }));
+  }
 
   const sections = [];
   const bySection = new Map();

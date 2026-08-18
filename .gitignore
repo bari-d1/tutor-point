@@ -13,6 +13,6 @@ __pycache__
 # Rendered email previews (npm run email:preview)
 .email-previews/
 
-# Generated student test links — contains parent contact details
-student-test-links.csv
+# Generated student test links — contain parent contact details
+student-test-links*.csv
 

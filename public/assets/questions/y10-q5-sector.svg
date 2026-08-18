@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 340" width="400" height="340">
+  <title>A playground shaped as the major sector of a circle of radius 15 m, with a reflex angle of 300 degrees</title>
+  <style>
+    .lbl{font:500 14px Helvetica,Arial,sans-serif;fill:#2A2A2A}
+    .shape{stroke:#2A2A2A;stroke-width:1.6;fill:none}
+    .note{font:italic 12px Helvetica,Arial,sans-serif;fill:#666}
+  </style>
+  <text class="note" x="252" y="20">Not drawn accurately</text>
+  <path class="shape" d="M200,160 L135,272.6 A130,130 0 1 1 265,272.6 Z"/>
+  <path class="shape" d="M172,188 A40,40 0 1 1 228,188" stroke-width="1.1"/>
+  <text class="lbl" x="180" y="152" font-weight="600">300°</text>
+  <text class="lbl" x="140" y="232">15m</text>
+  <text class="lbl" x="228" y="232">15m</text>
+  <text class="lbl" x="163" y="92" font-weight="600">Playground</text>
+</svg>

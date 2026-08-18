@@ -26,6 +26,13 @@ const ACCOUNTS = [
     childClass: "SSS 3",
     parentName: "TutorPoint QA",
     parentEmail: "qa+ss3@tutorpoint.ng"
+  },
+  {
+    id: "student-test-y10",
+    childName: "Y10 Test Student",
+    childClass: "Year 10",
+    parentName: "TutorPoint QA",
+    parentEmail: "qa+y10@tutorpoint.ng"
   }
 ];
 

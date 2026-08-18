@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 250" width="480" height="250">
+  <title>A sphere of radius x cm beside a cuboid measuring x cm by 2x cm by 2x cm</title>
+  <style>
+    .shape{stroke:#2A2A2A;stroke-width:1.6;fill:none}
+    .lbl{font:italic 14px Helvetica,Arial,sans-serif;fill:#2A2A2A}
+    .rad{stroke:#2A2A2A;stroke-width:1.2}
+  </style>
+
+  <circle class="shape" cx="105" cy="120" r="72" fill="#e9e9e7"/>
+  <circle cx="105" cy="120" r="2.5" fill="#2A2A2A"/>
+  <line class="rad" x1="105" y1="120" x2="156" y2="69"/>
+  <path class="rad" d="M148,70 L156,69 L155,77"/>
+  <text class="lbl" x="112" y="88">x cm</text>
+
+  <path class="shape" d="M290,70 L410,70 L410,200 L290,200 Z"/>
+  <path class="shape" d="M290,70 L322,42 L442,42 L410,70"/>
+  <path class="shape" d="M410,200 L442,172 L442,42"/>
+  <text class="lbl" x="252" y="120">2x cm</text>
+  <text class="lbl" x="330" y="222">2x cm</text>
+  <text class="lbl" x="418" y="192">x cm</text>
+</svg>

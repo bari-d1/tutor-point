@@ -4,7 +4,7 @@ import {
   buildStudentPaper,
   normalizeClassLevel,
   stripAnswers,
-  TEST_DURATION_MINUTES,
+  getDurationMinutes,
   CLASS_LEVELS
 } from "../services/studentQuestions.service.js";
 
@@ -68,7 +68,7 @@ router.get("/test/:registrationId", async (req, res) => {
       passwordRequired: true,
       alreadySubmitted: isTestAccount(registration.id) ? false : Boolean(submitted),
       testAccount: isTestAccount(registration.id),
-      durationMinutes: TEST_DURATION_MINUTES
+      durationMinutes: getDurationMinutes(classLevel)
     });
   } catch (err) {
     console.error(err);
@@ -129,7 +129,7 @@ router.post("/test/start/:registrationId", async (req, res) => {
           sessionId: existing.id,
           resumed: true,
           classLevel: existing.classLevel,
-          durationMinutes: TEST_DURATION_MINUTES,
+          durationMinutes: getDurationMinutes(existing.classLevel),
           startedAt: existing.startedAt,
           questions: stripAnswers(existing.questions)
         });
@@ -153,7 +153,7 @@ router.post("/test/start/:registrationId", async (req, res) => {
       sessionId: session.id,
       resumed: false,
       classLevel,
-      durationMinutes: TEST_DURATION_MINUTES,
+      durationMinutes: getDurationMinutes(classLevel),
       startedAt: session.startedAt,
       questions: stripAnswers(paper)
     });
@@ -187,7 +187,7 @@ router.post("/test/submit", async (req, res) => {
     }
 
     const elapsedMs = Date.now() - new Date(session.startedAt).getTime();
-    const expired = elapsedMs > TEST_DURATION_MINUTES * 60 * 1000;
+    const expired = elapsedMs > getDurationMinutes(session.classLevel) * 60 * 1000;
 
     const questions = session.questions;
     const answered = questions.filter((q) => String(answers[q.id] ?? "").trim()).length;
@@ -224,10 +224,11 @@ router.get("/test-levels", (req, res) => {
     ok: true,
     levels: Object.entries(CLASS_LEVELS).map(([level, cfg]) => ({
       level,
-      perSection: cfg.perSection,
+      perSection: cfg.perSection ?? null,
+      wholePaper: Boolean(cfg.wholePaper),
+      durationMinutes: cfg.durationMinutes,
       file: cfg.file
-    })),
-    durationMinutes: TEST_DURATION_MINUTES
+    }))
   });
 });
 

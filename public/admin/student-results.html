@@ -180,6 +180,12 @@
     .q-text { font-size: 0.9rem; line-height: 1.55; font-weight: 500; }
     .q-topic { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: #aaa; margin-top: 0.25rem; }
 
+    .q-figure {
+      margin: 0.5rem 0 0.75rem; border: 1.5px solid var(--gray); border-radius: 8px;
+      padding: 0.6rem; background: #fff; text-align: center; overflow-x: auto;
+    }
+    .q-figure img { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+
     .q-answers { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.85rem; margin-bottom: 0.6rem; }
     .answer-box { padding: 0.5rem 0.75rem; border-radius: 8px; border: 1.5px solid var(--gray); background: #fff; white-space: pre-wrap; word-break: break-word; }
     .answer-box label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; color: #888; display: block; margin-bottom: 3px; letter-spacing: 0.04em; }
@@ -566,6 +572,7 @@
             <div class="q-topic">${esc(q.section ?? "")}${q.topic ? " · " + esc(q.topic) : ""}${q.marks ? " · " + q.marks + " mark" + (q.marks > 1 ? "s" : "") : ""}</div>
           </div>
         </div>
+        ${q.image ? `<div class="q-figure"><img src="${esc(q.image)}" alt="${esc(q.imageAlt ?? "Diagram for this question")}" /></div>` : ""}
         <div class="q-answers">
           <div class="answer-box">
             <label>Student answer</label>

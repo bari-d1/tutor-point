@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 90" width="260" height="90">
+  <title>A four-digit combination lock currently showing 5, 7, 0, 7</title>
+  <style>
+    .digit{font:400 34px Helvetica,Arial,sans-serif;fill:#2A2A2A;text-anchor:middle}
+    .box{stroke:#2A2A2A;stroke-width:1.6;fill:none}
+  </style>
+  <rect class="box" x="20" y="15" width="220" height="60"/>
+  <line class="box" x1="75" y1="15" x2="75" y2="75"/>
+  <line class="box" x1="130" y1="15" x2="130" y2="75"/>
+  <line class="box" x1="185" y1="15" x2="185" y2="75"/>
+  <text class="digit" x="47.5" y="57">5</text>
+  <text class="digit" x="102.5" y="57">7</text>
+  <text class="digit" x="157.5" y="57">0</text>
+  <text class="digit" x="212.5" y="57">7</text>
+</svg>

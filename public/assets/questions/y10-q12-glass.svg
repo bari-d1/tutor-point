@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300" width="480" height="300">
+  <title>Two similar pieces of glass with arched tops, of widths 50 cm and 75 cm</title>
+  <style>
+    .shape{stroke:#2A2A2A;stroke-width:1.6;fill:none}
+    .lbl{font:500 13px Helvetica,Arial,sans-serif;fill:#2A2A2A;text-anchor:middle}
+    .note{font:italic 12px Helvetica,Arial,sans-serif;fill:#666}
+    .dim{stroke:#2A2A2A;stroke-width:1.1}
+  </style>
+  <text class="note" x="330" y="20">Not drawn accurately</text>
+
+  <path class="shape" d="M60,235 L60,120 Q60,80 105,80 Q150,80 150,120 L150,235 Z"/>
+  <line class="dim" x1="60" y1="255" x2="150" y2="255" marker-start="url(#a)" marker-end="url(#a)"/>
+  <path class="dim" d="M66,251 L60,255 L66,259"/>
+  <path class="dim" d="M144,251 L150,255 L144,259"/>
+  <text class="lbl" x="105" y="275">50 cm</text>
+
+  <path class="shape" d="M280,235 L280,95 Q280,42 347,42 Q414,42 414,95 L414,235 Z"/>
+  <line class="dim" x1="280" y1="255" x2="414" y2="255"/>
+  <path class="dim" d="M286,251 L280,255 L286,259"/>
+  <path class="dim" d="M408,251 L414,255 L408,259"/>
+  <text class="lbl" x="347" y="275">75 cm</text>
+</svg>

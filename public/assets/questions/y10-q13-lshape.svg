@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 290" width="360" height="290">
+  <title>An L-shape made from square ABCH, rectangle HCFG and square CDEF</title>
+  <style>
+    .shape{stroke:#2A2A2A;stroke-width:1.7;fill:none}
+    .dash{stroke:#2A2A2A;stroke-width:1.2;stroke-dasharray:6 4}
+    .pt{font:italic 14px Helvetica,Arial,sans-serif;fill:#2A2A2A}
+    .lbl{font:500 14px Helvetica,Arial,sans-serif;fill:#2A2A2A}
+    .note{font:italic 12px Helvetica,Arial,sans-serif;fill:#666}
+  </style>
+  <text class="note" x="228" y="18">Not drawn accurately</text>
+
+  <!-- A(70,55) B(210,55) C(210,195) D(255,195) E(255,240) F(210,240) G(70,240) -->
+  <path class="shape" d="M70,55 L210,55 L210,195 L255,195 L255,240 L210,240 L70,240 Z"/>
+  <line class="dash" x1="70" y1="195" x2="210" y2="195"/>
+
+  <text class="pt" x="58" y="50">A</text>
+  <text class="pt" x="215" y="50">B</text>
+  <text class="pt" x="216" y="191">C</text>
+  <text class="pt" x="259" y="191">D</text>
+  <text class="pt" x="260" y="253">E</text>
+  <text class="pt" x="205" y="256">F</text>
+  <text class="pt" x="60" y="256">G</text>
+  <text class="pt" x="57" y="199">H</text>
+
+  <text class="lbl" x="105" y="43">(x + 3) cm</text>
+  <text class="lbl" x="268" y="222">3 cm</text>
+</svg>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 250" width="300" height="250">
+  <title>An empty cone standing point-down, of radius 1.5 metres and height 4 metres</title>
+  <style>
+    .shape{stroke:#2A2A2A;stroke-width:1.6;fill:none}
+    .lbl{font:500 13px Helvetica,Arial,sans-serif;fill:#2A2A2A}
+    .dim{stroke:#777;stroke-width:1;stroke-dasharray:4 3}
+  </style>
+  <ellipse class="shape" cx="150" cy="45" rx="85" ry="22"/>
+  <path class="shape" d="M65,45 L150,215 L235,45"/>
+  <line class="dim" x1="150" y1="45" x2="150" y2="215"/>
+  <line class="dim" x1="150" y1="45" x2="235" y2="45"/>
+  <text class="lbl" x="188" y="38">1.5 m</text>
+  <text class="lbl" x="158" y="140">4 m</text>
+</svg>

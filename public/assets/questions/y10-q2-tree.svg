@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 330" width="420" height="330">
+  <title>Probability tree diagram for two tosses of a biased coin, with blank probability labels</title>
+  <style>
+    .lbl{font:500 14px Helvetica,Arial,sans-serif;fill:#2A2A2A}
+    .hdr{font:700 14px Helvetica,Arial,sans-serif;fill:#2A2A2A}
+    .br{stroke:#2A2A2A;stroke-width:1.4;fill:none}
+    .blank{stroke:#999;stroke-width:1.6;stroke-dasharray:4 4}
+  </style>
+  <text class="hdr" x="105" y="22">First toss</text>
+  <text class="hdr" x="268" y="22">Second toss</text>
+
+  <circle cx="34" cy="175" r="3.5" fill="#2A2A2A"/>
+  <path class="br" d="M34,175 L158,105"/>
+  <path class="br" d="M34,175 L158,248"/>
+  <text class="lbl" x="166" y="110">head</text>
+  <text class="lbl" x="166" y="253">tail</text>
+  <line class="blank" x1="70" y1="132" x2="112" y2="132"/>
+  <line class="blank" x1="70" y1="222" x2="112" y2="222"/>
+
+  <path class="br" d="M196,100 L320,55"/>
+  <path class="br" d="M196,112 L320,168"/>
+  <text class="lbl" x="330" y="60">head</text>
+  <text class="lbl" x="330" y="173">tail</text>
+  <line class="blank" x1="232" y1="70" x2="274" y2="70"/>
+  <line class="blank" x1="232" y1="150" x2="274" y2="150"/>
+
+  <path class="br" d="M188,243 L320,198"/>
+  <path class="br" d="M188,255 L320,305"/>
+  <text class="lbl" x="330" y="203">head</text>
+  <text class="lbl" x="330" y="310">tail</text>
+  <line class="blank" x1="228" y1="212" x2="270" y2="212"/>
+  <line class="blank" x1="228" y1="288" x2="270" y2="288"/>
+</svg>

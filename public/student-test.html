@@ -201,6 +201,18 @@
       flex-shrink: 0;
     }
 
+    /* ── QUESTION DIAGRAM ── */
+    .q-figure {
+      margin: 0 0 1.25rem;
+      border: 1.5px solid var(--gray);
+      border-radius: 10px;
+      padding: 1rem;
+      background: #fff;
+      text-align: center;
+      overflow-x: auto;
+    }
+    .q-figure img { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+
     /* ── FREE ANSWER ── */
     .free-answer-wrap { display: flex; flex-direction: column; gap: 0.5rem; }
 
@@ -516,6 +528,7 @@
         <span class="q-marks" id="q-marks"></span>
       </div>
       <div class="q-text" id="q-text"></div>
+      <div id="q-figure"></div>
       <div id="q-input"></div>
     </div>
 
@@ -590,6 +603,7 @@
   const $qMeta  = document.getElementById("q-meta-text");
   const $qMarks = document.getElementById("q-marks");
   const $qText  = document.getElementById("q-text");
+  const $qFigure = document.getElementById("q-figure");
   const $qInput = document.getElementById("q-input");
   const $navGrid = document.getElementById("nav-grid");
 
@@ -696,6 +710,18 @@
 
     $btnPrev.disabled = current === 0;
     $btnNext.disabled = current === tot - 1;
+
+    // Diagram, for questions that have one.
+    $qFigure.innerHTML = "";
+    if (q.image) {
+      const fig = document.createElement("div");
+      fig.className = "q-figure";
+      const img = document.createElement("img");
+      img.src = q.image;
+      img.alt = q.imageAlt ?? "Diagram for this question";
+      fig.appendChild(img);
+      $qFigure.appendChild(fig);
+    }
 
     $qInput.innerHTML = "";
 
