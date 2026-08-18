@@ -33,7 +33,10 @@ export function normalizeClassLevel(raw) {
 
   if (["SS2", "SSS2", "SENIORSECONDARY2"].includes(s)) return "SS2";
   if (["SS3", "SSS3", "SENIORSECONDARY3"].includes(s)) return "SS3";
-  if (["Y10", "YEAR10", "4THYEAR", "FOURTHYEAR", "GCSE"].includes(s)) return "Y10";
+  // SS1 sits the Y10 paper — same stage of the syllabus.
+  if (["SS1", "SSS1", "SENIORSECONDARY1", "Y10", "YEAR10", "4THYEAR", "FOURTHYEAR", "GCSE"].includes(s)) {
+    return "Y10";
+  }
 
   return null;
 }
