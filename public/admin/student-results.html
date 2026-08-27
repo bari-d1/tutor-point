@@ -322,6 +322,7 @@
       <div class="footer-actions">
         <span class="save-note" id="save-note"></span>
         <input type="text" id="marked-by" placeholder="Marked by…" />
+        <button class="btn btn-outline btn-sm" id="script-btn">Export script</button>
         <button class="btn btn-outline btn-sm" id="reopen-btn">Reopen</button>
         <button class="btn" id="save-btn">Save score</button>
       </div>
@@ -678,6 +679,138 @@
         setTimeout(closeModal, 700);
       }
     } catch {}
+  });
+
+  // ── Exam script export ───────────────────────────────
+  /**
+   * Builds a self-contained, print-ready copy of one student's paper:
+   * every question, their answer, the expected answer, and any diagram.
+   * Opened in a new tab so it can be printed or saved as PDF.
+   */
+  function buildScriptHtml(r, { verdictMap }) {
+    const status = statusOf(r);
+    const pct = r.score === null ? null : Math.round((r.score / r.total) * 100);
+
+    const meta = [
+      ["Student", r.studentName],
+      ["Class", `${r.childClass} — ${r.classLevel} paper`],
+      ["Parent", `${r.parentName} (${r.parentEmail})`],
+      ["Started", fmtDate(r.startedAt)],
+      ["Submitted", r.submittedAt ? fmtDate(r.submittedAt) : "Not submitted"],
+      ["Answered", `${r.answered} of ${r.total}`],
+      ["Status", status === "MARKED" ? `Marked${r.markedBy ? " by " + r.markedBy : ""}` : status === "PENDING" ? "Awaiting marking" : "In progress"],
+      ["Score", r.score === null ? "—" : `${r.score} / ${r.total}  (${pct}%)`]
+    ];
+
+    const totalMarks = r.questions.reduce((a, q) => a + (q.marks || 0), 0);
+
+    const questions = r.questions.map((q, i) => {
+      const given = String(r.answers?.[q.id] ?? "").trim();
+      const v = verdictMap ? verdictMap[q.id] : undefined;
+      const tick = v === true ? '<span class="v ok">✓</span>' : v === false ? '<span class="v no">✕</span>' : "";
+
+      const opts = ["A", "B", "C", "D"]
+        .filter((k) => q[`option${k}`])
+        .map((k) => `<li><b>${k}.</b> ${esc(q[`option${k}`])}</li>`)
+        .join("");
+
+      return `
+      <article class="q">
+        <header>
+          <span class="qn">Q${i + 1}</span>
+          <div class="qhead">
+            <div class="qtext">${esc(q.question)}</div>
+            <div class="qmeta">${esc(q.section ?? "")}${q.topic ? " · " + esc(q.topic) : ""}${q.marks ? ` · ${q.marks} mark${q.marks > 1 ? "s" : ""}` : ""}</div>
+          </div>
+          ${tick}
+        </header>
+        ${q.image ? `<div class="fig"><img src="${esc(q.image)}" alt="${esc(q.imageAlt ?? "Diagram")}"></div>` : ""}
+        ${opts ? `<ul class="opts">${opts}</ul>` : ""}
+        <div class="ans">
+          <div class="box given">
+            <label>Student answer</label>
+            <div>${given ? esc(given) : '<i class="blank">No answer given</i>'}</div>
+          </div>
+          <div class="box key">
+            <label>Expected answer</label>
+            <div>${esc(q.answer ?? "—")}</div>
+          </div>
+        </div>
+        <div class="marker"><label>Marker's comment</label><div class="rule"></div></div>
+      </article>`;
+    }).join("");
+
+    return `<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<title>${esc(r.studentName)} — ${esc(r.classLevel)} maths script</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Helvetica,Arial,sans-serif;color:#2A2A2A;line-height:1.5;background:#f4f4f2;padding:24px}
+  .sheet{max-width:820px;margin:0 auto;background:#fff;padding:36px 40px;border-radius:8px}
+  .toolbar{max-width:820px;margin:0 auto 16px;display:flex;gap:8px;justify-content:flex-end}
+  .toolbar button{font:600 13px Helvetica,Arial,sans-serif;padding:9px 16px;border-radius:999px;border:1.5px solid #2A2A2A;background:#2A2A2A;color:#FFEB3C;cursor:pointer}
+  h1{font-size:20px;margin-bottom:2px}
+  .sub{font-size:13px;color:#666;margin-bottom:20px}
+  table.meta{width:100%;border-collapse:collapse;margin-bottom:24px;font-size:13px}
+  table.meta td{padding:5px 8px;border-bottom:1px solid #ededec;vertical-align:top}
+  table.meta td:first-child{color:#888;width:130px;font-weight:600}
+  .q{border:1.5px solid #ededec;border-radius:8px;padding:16px;margin-bottom:14px;break-inside:avoid;page-break-inside:avoid}
+  .q header{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px}
+  .qn{font-size:11px;font-weight:700;background:#ededec;border-radius:999px;padding:2px 9px;white-space:nowrap;margin-top:2px}
+  .qhead{flex:1}
+  .qtext{font-size:14px;font-weight:500}
+  .qmeta{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:#aaa;margin-top:3px}
+  .v{font-size:18px;font-weight:700}.v.ok{color:#1f9d55}.v.no{color:#c0392b}
+  .fig{text-align:center;margin:10px 0}
+  .fig img{max-width:100%;height:auto}
+  ul.opts{list-style:none;margin:8px 0;font-size:13px}
+  ul.opts li{padding:3px 0}
+  .ans{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+  .box{border:1.5px solid #ededec;border-radius:6px;padding:8px 10px;font-size:13px;white-space:pre-wrap;word-break:break-word;min-height:46px}
+  .box label{display:block;font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#888;margin-bottom:3px}
+  .box.key{background:#faf9f6}
+  body.nokey .box.key{display:none}
+  body.nokey .ans{grid-template-columns:1fr}
+  body.nokey .keynote{display:inline}
+  .keynote{display:none}
+  .blank{color:#bbb}
+  .marker{margin-top:10px}
+  .marker label{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#888}
+  .marker .rule{border-bottom:1px dashed #ccc;height:22px}
+  footer{margin-top:24px;padding-top:12px;border-top:1.5px solid #ededec;font-size:11px;color:#999;display:flex;justify-content:space-between}
+  @media print{
+    body{background:#fff;padding:0}
+    .sheet{max-width:none;padding:0;border-radius:0}
+    .toolbar{display:none}
+    @page{margin:16mm}
+  }
+</style></head>
+<body>
+  <div class="toolbar">
+    <button onclick="document.body.classList.toggle('nokey');this.textContent=document.body.classList.contains('nokey')?'Show answer key':'Hide answer key'">Hide answer key</button>
+    <button onclick="window.print()">Print / Save as PDF</button>
+  </div>
+  <div class="sheet">
+    <h1>${esc(r.studentName)} — ${esc(r.classLevel)} Mathematics</h1>
+    <div class="sub">TutorPoint assessment script · ${r.total} questions · ${totalMarks} marks available<span class="keynote"> · student copy, answer key hidden</span></div>
+    <table class="meta">${meta.map(([k, v]) => `<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join("")}</table>
+    ${questions}
+    <footer><span>TutorPoint · ${esc(r.classLevel)} Mathematics</span><span>Generated ${new Date().toLocaleString("en-GB")}</span></footer>
+  </div>
+</body></html>`;
+  }
+
+  $("script-btn").addEventListener("click", () => {
+    if (!openRow) return;
+    const html = buildScriptHtml(openRow, { verdictMap: verdicts });
+    const w = window.open("", "_blank");
+    if (!w) {
+      $saveNote.textContent = "Allow pop-ups to export the script";
+      $saveNote.className = "save-note err";
+      return;
+    }
+    w.document.write(html);
+    w.document.close();
   });
 
   // ── CSV export ───────────────────────────────────────

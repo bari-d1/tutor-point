@@ -16,3 +16,6 @@ __pycache__
 # Generated student test links — contain parent contact details
 student-test-links*.csv
 
+
+# Local exam-script preview
+.exam-script-preview.html
